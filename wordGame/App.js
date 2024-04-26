@@ -4,9 +4,23 @@ import { StyleSheet, Text, TextInput, View, Dimensions } from 'react-native';
 const screenDimensions = Dimensions.get("screen");
 
 export default function App() {
+  const grid = Array(6).fill(0).map(() => Array(6).fill(1));
+
   return (
     <View style = {styles.container}>
-      <View style = {styles.row}>
+      {grid.map((column, i) => (
+        <View key = {i} style = {styles.row}>
+          {column.map((row, i) => (
+            <View key = {i} style = {styles.wordCell}>
+              <TextInput style = {styles.cell}
+                         value = {row.toString()}
+                         maxLength = {1}
+              />
+            </View>
+          ))}
+        </View>
+      ))}
+      {/* <View style = {styles.row}>
         <View style = {styles.wordCell}>
           <TextInput style = {styles.cell}
                      value = "A"
@@ -29,25 +43,13 @@ export default function App() {
                      value = "D"
                      maxLength = {1}
           />
-        </View>
-
-        <View style = {styles.wordCell}>
-          <TextInput style = {styles.cell}
-                     value = "C"
-                     maxLength = {1}
-          />
-
-          <TextInput style = {styles.cell}
-                     value = "D"
-                     maxLength = {1}
-          />
 
           <TextInput style = {styles.cell}
                      value = "E"
                      maxLength = {1}
           />
         </View>
-      </View>
+      </View> */}
 
       <StatusBar style="auto" />
     </View>
@@ -76,5 +78,5 @@ const styles = StyleSheet.create({
     width: screenDimensions.width/10,
     aspectRatio: 1,
     textAlign: "center",
-  }
+  },
 });

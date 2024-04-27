@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View, Dimensions } from "react-native";
 
 const screenDimensions = Dimensions.get("screen");
@@ -13,36 +13,45 @@ const generateGrid = (crosswordsProc) => {
             }else{
                 grid[yPos + j][xPos] = "";
             }
-
-            if(j == 0){
-                grid[yPos][xPos] = i.toString() + direction;
-            }
         }
     });
 
     return grid;
 };
 
-const DisplayGrid = ({crosswordsProc}) => {
+const DisplayGame = ({crosswordsProc}) => {
     const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc));
 
-    const display = () => (
-        <View style = {styles.container}>
+    // Update grid if crosswordsProc is updated/changed
+    useEffect(() => {
+        setDisGrid(generateGrid(crosswordsProc));
+    }, [crosswordsProc]);
+
+    const handleInput = (row, col, input) => {
+        const newGrid = [...disGrid];
+        newGrid[row][col] = input;
+        setDisGrid(newGrid);
+    };
+
+    const displayGrid = () => (
+        <View>
             {disGrid.map((row, i) => (
                 <View key = {i} style = {styles.row}>
                     {row.map((cell, j) => (
                         <View key = {j} style = {styles.wordCell}>
-                            {cell !== "" && cell !== "-1" ?
-                            <Text style = {styles.title}>
-                            {cell}
-                            </Text>
-                            : null}
+                            {crosswordsProc.map(({xPos, yPos, direction}, ind) => {
+                                return i === yPos && j === xPos ?
+                                <Text key = {ind + direction} style = {styles.title}>{ind + direction}</Text>
+                                :
+                                null;
+                            })}
 
                             <TextInput style = {[styles.cell,
                                                 cell === "-1" ? styles.emptyCell : null]}
-                                        value = ""
+                                        value = {cell}
                                         editable = {cell !== "-1"}
                                         maxLength = {1}
+                                        onChangeText = {(input) => handleInput(i, j, input.toUpperCase())}
                             />
                         </View>
                     ))}
@@ -51,9 +60,18 @@ const DisplayGrid = ({crosswordsProc}) => {
         </View>
     );
 
-    return(
+    const displayMaster = () => (
         <View>
-            {display()}
+            <TextInput style = {[styles.cell, {flexDirection: "row"}]}/>
+            <TextInput style = {[styles.cell, {flexDirection: "row"}]}/>
+            <TextInput style = {[styles.cell, {flexDirection: "row"}]}/>
+        </View>
+    );
+
+    return(
+        <View style = {styles.container}>
+            {displayGrid()}
+            {displayMaster()}
         </View>
     );
 };
@@ -88,12 +106,12 @@ const styles = StyleSheet.create({
     },
 
     title: {
-      position: 'absolute',
+      position: "absolute",
           top: 2,
           left: 2,
-          fontSize: 10,
-          fontWeight: 'bold',
+          fontSize: 6,
+          fontWeight: "bold",
     },
 });
 
-export default DisplayGrid;
+export default DisplayGame;

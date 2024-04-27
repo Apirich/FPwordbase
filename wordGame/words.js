@@ -1,4 +1,4 @@
-const libraries = ["cat", "bird", "dog", "smile", "dance", "song", "music"];
+const libraries = ["cat", "bird", "dog", "smile", "dance", "song", "music", "love", "laugh"];
 const positions = [0, 1, 2, 3, 4];
 
 let words = [];
@@ -28,7 +28,7 @@ while(wYpos.length < 5){
   }
 }
 
-for(let i = 0; i < 5; ++i){
+for(let i = 0; i < words.length; ++i){
   wordsData.push({
     "direction": Math.random() < 0.5 ? "A" : "D",
     "word": words[i],

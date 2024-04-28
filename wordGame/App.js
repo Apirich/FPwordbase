@@ -1,15 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, Text } from "react-native";
-
-import { wordsList, masterList } from "./words";
-import DisplayGame from "./grid";
 import { useEffect, useState } from "react";
 
+import { wordsList, masterList } from "./src/helpers/words";
+import DisplayGame from "./src/components/grid";
 
-// const computeLevel = (score) => {
-//   const level = Math.ceil(score/15);
-//   return level;
-// };
+import { getScore, updateScore } from "./src/database/dbQueries";
+
 
 export default function App() {
   const crosswords = wordsList;
@@ -17,11 +14,32 @@ export default function App() {
 
   const [disScore, setDisScore] = useState(0);
   const [disLevel, setDisLevel] = useState(1);
-  // const [disLevel, setDisLevel] = useState(computeLevel(disScore));
 
+  // Retrieve score from the database, ONLY ONCE when the app start
   useEffect(() => {
-    setDisLevel(1 + Math.floor(disScore/15));
+    getScore()
+    .then((data) => {
+      setDisScore(data);
+    })
+    .catch((error) => {
+      console.error("Error getScore() from SQLite:", error);
+    });
+  }, []);
+
+  // Update score to the database when disScore is changed
+  useEffect(() => {
+    setDisLevel(1 + Math.floor(disScore/10));
+
+    updateScore(disScore)
+    .catch((error) => {
+      console.error('Error updating score:', error);
+    });
   }, [disScore]);
+
+
+  // useEffect(() => {
+  //   setDisLevel(1 + Math.floor(disScore/10));
+  // }, [disScore]);
 
 
   const computeScore = (score) => {

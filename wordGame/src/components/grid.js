@@ -38,7 +38,11 @@ const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
     useEffect(() => {
         setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
         setDisMaster(generateMasterCell(master[level - 1][numGame]));
-    }, [crosswordsProc, master, numGame]);
+    }, [crosswordsProc, master, numGame, level]);
+
+    useEffect(() => {
+        setDisStatus("Need to be solved!");
+    }, [level]);
 
     const handleGridInput = (row, col, input) => {
         const newGrid = [...disGrid];

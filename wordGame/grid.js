@@ -24,7 +24,7 @@ const generateMasterCell = (master) => {
     return masterCell;
 };
 
-const DisplayGame = ({level, score, crosswordsProc, master}) => {
+const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
     const [numGame, setNumGame] = useState(0);
     const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc[level - 1][numGame]));
     const [disMaster, setDisMaster] = useState(generateMasterCell(master[level - 1][numGame]));
@@ -33,11 +33,12 @@ const DisplayGame = ({level, score, crosswordsProc, master}) => {
 
     console.log(master[level - 1][numGame]);
 
-    // Update grid/master if crosswordsProc/master are updated/changed
+    // Update grid/master if crosswordsProc/master are updated/changed in words.js
+    // and if numGame/level are updated/changed (generate New Game/level up)
     useEffect(() => {
         setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
         setDisMaster(generateMasterCell(master[level - 1][numGame]));
-    }, [crosswordsProc, master]);
+    }, [crosswordsProc, master, numGame]);
 
     const handleGridInput = (row, col, input) => {
         const newGrid = [...disGrid];
@@ -57,6 +58,7 @@ const DisplayGame = ({level, score, crosswordsProc, master}) => {
 
         if(verifyMaster === master[level - 1][numGame]){
             setDisStatus("Nailed it!");
+            computeScore(score + 5);
         }else{
             setDisStatus("Try again!");
         }
@@ -92,16 +94,14 @@ const DisplayGame = ({level, score, crosswordsProc, master}) => {
     };
 
     const handleGenerate = () => {
-        let temp = numGame;
-
-        if(temp < 2){
-            setNumGame(temp + 1);
+        if(numGame < 2){
+            setNumGame(numGame + 1);
         }else{
             setNumGame(0);
         }
 
-        setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
-        setDisMaster(generateMasterCell(master[level - 1][numGame]));
+        // setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
+        // setDisMaster(generateMasterCell(master[level - 1][numGame]));
         setDisMatch("");
         setDisStatus("Need to be solved!");
     };

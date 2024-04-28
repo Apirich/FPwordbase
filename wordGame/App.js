@@ -13,6 +13,10 @@ export default function App() {
   const [disLevel, setDisLevel] = useState(1);
   const [disScore, setDisScore] = useState(0);
 
+  const computeScore = (score) => {
+    setDisScore(score);
+  }
+
   return(
     <View style = {styles.container}>
       <View style = {styles.scoreLvl}>
@@ -20,7 +24,7 @@ export default function App() {
         <Text>Score: {disScore}</Text>
       </View>
 
-      <DisplayGame level = {disLevel} scrore = {disScore} crosswordsProc = {crosswords} master = {master}/>
+      <DisplayGame level = {disLevel} score = {disScore} computeScore = {computeScore} crosswordsProc = {crosswords} master = {master}/>
       <StatusBar style="auto" />
     </View>
   );

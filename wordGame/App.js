@@ -1,26 +1,26 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, Text } from "react-native";
 
-import { wordsList, masterWord } from "./words";
+import { wordsList, masterList } from "./words";
 import DisplayGame from "./grid";
 import { useState } from "react";
 
 
 export default function App() {
   const crosswords = wordsList;
-  const master = masterWord;
+  const master = masterList;
 
-  const [disLevel, setDisLevel] = useState("Level 1");
+  const [disLevel, setDisLevel] = useState(1);
   const [disScore, setDisScore] = useState(0);
 
   return(
     <View style = {styles.container}>
       <View style = {styles.scoreLvl}>
-        <Text>{disLevel}</Text>
+        <Text>Level: {disLevel}</Text>
         <Text>Score: {disScore}</Text>
       </View>
 
-      <DisplayGame crosswordsProc = {crosswords} master = {master}/>
+      <DisplayGame level = {disLevel} scrore = {disScore} crosswordsProc = {crosswords} master = {master}/>
       <StatusBar style="auto" />
     </View>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View, Dimensions, Button } from "react-native";
+import { StyleSheet, Text, TextInput, View, Dimensions, Button, TouchableOpacity } from "react-native";
 
 const screenDimensions = Dimensions.get("screen");
 
@@ -21,20 +21,22 @@ const generateGrid = (crosswordsProc) => {
 
 const generateMasterCell = (master) => {
     const masterCell = Array(master.length).fill("");
-
     return masterCell;
 };
 
-const DisplayGame = ({crosswordsProc, master}) => {
-    const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc));
-    const [disMaster, setDisMaster] = useState(generateMasterCell(master));
+const DisplayGame = ({level, score, crosswordsProc, master}) => {
+    const [numGame, setNumGame] = useState(0);
+    const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc[level - 1][numGame]));
+    const [disMaster, setDisMaster] = useState(generateMasterCell(master[level - 1][numGame]));
     const [disMatch, setDisMatch] = useState([]);
     const [disStatus, setDisStatus] = useState("Need to be solved!");
 
+    console.log(master[level - 1][numGame]);
+
     // Update grid/master if crosswordsProc/master are updated/changed
     useEffect(() => {
-        setDisGrid(generateGrid(crosswordsProc));
-        setDisMaster(generateMasterCell(master));
+        setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
+        setDisMaster(generateMasterCell(master[level - 1][numGame]));
     }, [crosswordsProc, master]);
 
     const handleGridInput = (row, col, input) => {
@@ -53,7 +55,7 @@ const DisplayGame = ({crosswordsProc, master}) => {
         const verifyMaster = [...disMaster].join("");
         const verifyGrid = [...disGrid];
 
-        if(verifyMaster === master){
+        if(verifyMaster === master[level - 1][numGame]){
             setDisStatus("Nailed it!");
         }else{
             setDisStatus("Try again!");
@@ -63,7 +65,7 @@ const DisplayGame = ({crosswordsProc, master}) => {
 
         for(let i = 0; i < verifyGrid.length; ++i){
             for(let j = 0; j < verifyGrid[i].length; ++j){
-                if(verifyGrid[i][j] !== "" && master.includes(verifyGrid[i][j])){
+                if(verifyGrid[i][j] !== "" && master[level - 1][numGame].includes(verifyGrid[i][j])){
                     match.add(verifyGrid[i][j]);
                 }
             }
@@ -86,11 +88,20 @@ const DisplayGame = ({crosswordsProc, master}) => {
         }
 
         setDisGrid(resetGrid);
+        setDisMaster(generateMasterCell(master[level - 1][numGame]));
     };
 
     const handleGenerate = () => {
-        setDisGrid(generateGrid(crosswordsProc));
-        setDisMaster(generateMasterCell(master));
+        let temp = numGame;
+
+        if(temp < 2){
+            setNumGame(temp + 1);
+        }else{
+            setNumGame(0);
+        }
+
+        setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
+        setDisMaster(generateMasterCell(master[level - 1][numGame]));
         setDisMatch("");
         setDisStatus("Need to be solved!");
     };
@@ -102,7 +113,7 @@ const DisplayGame = ({crosswordsProc, master}) => {
                 <View key = {i} style = {styles.row}>
                     {row.map((cell, j) => (
                         <View key = {j} style = {styles.wordCell}>
-                            {crosswordsProc.map(({xPos, yPos, direction}, ind) => {
+                            {crosswordsProc[level - 1][numGame].map(({xPos, yPos, direction}, ind) => {
                                 return i === yPos && j === xPos ?
                                 <Text key = {ind + direction} style = {styles.title}>{ind + 1 + direction}</Text>
                                 :
@@ -160,27 +171,20 @@ const DisplayGame = ({crosswordsProc, master}) => {
             </View>
 
             <View style = {styles.buttonCon}>
-                <Button color = {"green"}
-						title = "Verify"
-						onPress = {handleVerify}
-						style = {styles.button}
-                />
+                <TouchableOpacity style = {styles.button} onPress = {() => handleVerify()} disabled = {disStatus === "Nailed it!" ? true : false}>
+                    <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Verify</Text>
+                </TouchableOpacity>
                 <View style = {styles.gap}/>
 
-                <Button color = {"green"}
-						title = "Reset"
-						onPress = {handleReset}
-						style = {styles.button}
-                />
+                <TouchableOpacity style = {styles.button} onPress = {() => handleReset()} disabled = {disStatus === "Nailed it!" ? true : false}>
+                    <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Reset</Text>
+                </TouchableOpacity>
                 <View style = {styles.gap}/>
 
-                <Button color = {"green"}
-						title = "New Game"
-						onPress = {handleGenerate}
-						style = {styles.button}
-                />
+                <TouchableOpacity style = {styles.button} onPress = {() => handleGenerate()}>
+                    <Text style = {styles.buttonText}>New Game</Text>
+                </TouchableOpacity>
                 <View style = {styles.gap}/>
-
             </View>
         </View>
     );
@@ -240,6 +244,16 @@ const styles = StyleSheet.create({
 	button: {
 		flex: 1, // Ensure equal width for both buttons
 	},
+
+    buttonText: {
+        color: "green",
+        fontSize: screenDimensions.width/20,
+    },
+
+    disableButtonText: {
+        color: "grey",
+        fontSize: screenDimensions.width/20,
+    },
 
 	gap: {
 		width: 10, // Adjust the width as needed for the desired gap

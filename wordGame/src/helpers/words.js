@@ -1,3 +1,5 @@
+import readFile from "./readFile";
+
 const library = ["cat", "bird", "dog", "smile", "dance", "song", "music", "love", "laugh"];
 const masterLibrary = ["humble", "gorgeous", "kindness", "friendly", "chance"];
 const positions = [0, 1, 2, 3, 4];
@@ -12,6 +14,15 @@ let wYpos = [];
 
 let wordsData = [];
 let masterData = [];
+
+
+const fetchData = async () => {
+  const dataArray = await readFile(); // Call the function to get the data array
+  console.log(dataArray); // Do something with the data array
+};
+
+fetchData(); // Call fetchData function
+
 
 const randomPick = (itemList, loopTime, libName) => {
   while(itemList.length < loopTime){

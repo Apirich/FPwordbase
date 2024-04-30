@@ -32,8 +32,10 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
     const [disMaster, setDisMaster] = useState(generateMasterCell(master[(level - 1) % maxLevel][numGame]));
     const [disMatch, setDisMatch] = useState([]);
     const [disStatus, setDisStatus] = useState("Need to be solved!");
+    const [solvedGame, setSolvedGame] = useState([gamePerLevel]);
 
     console.log(master[(level - 1) % maxLevel][numGame]);
+    // console.log(level, numGame);
 
     const [crosswordData, setCrosswordData] = useState(crosswordsProc[(level - 1) % maxLevel][numGame]);
     // console.log(crosswordData);
@@ -50,6 +52,10 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
         setDisStatus("Need to be solved!");
     }, [level]);
 
+    useEffect(() => {
+        setSolvedGame([gamePerLevel]);
+    }, [crosswordsProc, master, level, maxLevel, gamePerLevel]);
+
     const handleGridInput = (row, col, input) => {
         const newGrid = [...disGrid];
         newGrid[row][col] = input;
@@ -63,14 +69,17 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
     };
 
     const handleVerify = (cwData) => {
-        console.log(cwData);
-
         const verifyMaster = [...disMaster].join("");
         const verifyGrid = [...disGrid];
+        const verifySolvedGame = [...solvedGame];
 
         if(verifyMaster === master[(level - 1) % maxLevel][numGame]){
             setDisStatus("Nailed it!");
             computeScore(score + 5);
+
+            // Add new solved game to solvedGame[]
+            verifySolvedGame.push(numGame);
+            setSolvedGame(verifySolvedGame);
         }else{
             setDisStatus("Try again!");
 
@@ -129,10 +138,54 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
     };
 
     const handleGenerate = () => {
-        if(numGame < gamePerLevel - 1){
-            setNumGame(numGame + 1);
-        }else{
-            setNumGame(0);
+        const gPerLevel = gamePerLevel;
+        let solvedGameArr = [...solvedGame];
+        let nGame = numGame;
+
+        console.log(solvedGame, gamePerLevel);
+        console.log(numGame, nGame);
+
+        // Only incase when gamePerLevel <= score to level up
+        // Not apply in this App!!!
+        // Just here for completeness!!!
+        if(solvedGameArr.length >= gPerLevel + 1){
+            solvedGameArr = [gPerLevel];
+            setSolvedGame([gPerLevel]);
+        }
+
+        // Logic indeed start from here
+        if(nGame < gPerLevel){
+            nGame++;
+
+            if(solvedGameArr.indexOf(nGame) == -1){
+                setNumGame(nGame);
+            }else{
+                while(nGame < gPerLevel){
+                    nGame++;
+
+                    if(solvedGameArr.indexOf(nGame) == -1){
+                        setNumGame(nGame);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(nGame >= gPerLevel){
+            nGame = 0;
+
+            if(solvedGameArr.indexOf(nGame) == -1){
+                setNumGame(nGame);
+            }else{
+                while(nGame < gPerLevel){
+                    nGame++;
+
+                    if(solvedGameArr.indexOf(nGame) == -1){
+                        setNumGame(nGame);
+                        break;
+                    }
+                }
+            }
         }
 
         // setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));

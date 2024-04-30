@@ -2,9 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, Text } from "react-native";
 import { useEffect, useState } from "react";
 
-import { wordsList, masterList } from "./src/helpers/words";
+// import { wordsList, masterList } from "./src/helpers/words";
 
-import { processLibrary } from "./src/helpers/words";
+// import { processLibrary } from "./src/helpers/words";
 import DisplayGame from "./src/components/grid";
 
 import { getScore, updateScore } from "./src/database/dbQueries";
@@ -24,51 +24,64 @@ import { generate, count } from "random-words";
 //   }
 // };
 
-const generateMaster = (gen, level, game) => {
-  let mArray = []
 
-  for(let i = 0; i < level; ++i){
-    mArray.push([]);
-
-    for(let j = 0; j < game; ++j){
-      mArray[i].push(gen[j + 3 * i]);
+const randomPick = (itemList, loopTime, libName) => {
+  while(itemList.length < loopTime){
+    chosenItem = libName[Math.floor(Math.random() * libName.length)]
+    if(itemList.indexOf(chosenItem) === -1){
+      itemList.push(chosenItem);
     }
   }
 
-  return mArray;
+  return itemList;
 };
 
+const generateLibrary = (gen, level, game, word) => {
+  const positions = [0, 1, 2, 3, 4];
+  let wXpos = [];
+  let wYpos = [];
 
-const generateCrosswords = (gen, level, game, word) => {
-  let cArray = []
+  let arrLib = []
 
   for(let i = 0; i < level; ++i){
-    cArray.push([]);
+    arrLib.push([]);
 
     for(let j = 0; j < game; ++j){
-      cArray[i].push([]);
+      if(word > 1){
+        wXpos = randomPick(wXpos, word, positions);
+        wYpos = randomPick(wYpos, word, positions);
 
-      for(let k = 0; k < word; ++k){
-        cArray[i][j].push(gen[j + 3 * i]);
+        arrLib[i].push([]);
+
+        for(let k = 0; k < word; ++k){
+          arrLib[i][j].push({
+            "direction": Math.random() < 0.5 ? "A" : "D",
+            "word": gen[word * game * i + word * j + k],
+            "xPos": wXpos[k],
+            "yPos": wYpos[k],
+          });
+        }
+      }else{
+        arrLib[i].push(gen[game * i + j]);
       }
     }
   }
 
-  return cArray;
+  return arrLib;
 };
 
 export default function App() {
-  const [testMas, setTestMas] = useState(generateMaster(
+  const [master, setMaster] = useState(generateLibrary(
     generate({
       exactly: 30,
       wordsPerString: 1,
       minLength: 6,
       maxLength: 8,
       formatter: (word) => word.toUpperCase(),
-    }), 10, 3)
+    }), 10, 3, 1)
   );
 
-  const [testCross, setTestCross] = useState(generateCrosswords(
+  const [crosswords, setCrosswords] = useState(generateLibrary(
     generate({
       exactly: 150,
       wordsPerString: 1,
@@ -78,10 +91,8 @@ export default function App() {
     }), 10, 3, 5)
   );
 
-  console.log(testCross);
-
-  const [crosswords, setCrosswords] = useState(wordsList);
-  const [master, setMaster] = useState(masterList);
+  // const [crosswords, setCrosswords] = useState(wordsList);
+  // const [master, setMaster] = useState(masterList);
 
   const [disScore, setDisScore] = useState(0);
   const [disLevel, setDisLevel] = useState(1);
@@ -134,7 +145,7 @@ export default function App() {
       <DisplayGame level = {disLevel}
                    score = {disScore} computeScore = {computeScore}
                    crosswordsProc = {crosswords}
-                   master = {testMas}
+                   master = {master}
       />
 
       <StatusBar style="auto" />

@@ -71,6 +71,9 @@ const generateLibrary = (gen, level, game, word) => {
 };
 
 export default function App() {
+  const maxLevel = 10;
+  const gamePerLevel = 3;
+
   const [master, setMaster] = useState(generateLibrary(
     generate({
       exactly: 30,
@@ -78,7 +81,7 @@ export default function App() {
       minLength: 6,
       maxLength: 8,
       formatter: (word) => word.toUpperCase(),
-    }), 10, 3, 1)
+    }), maxLevel, gamePerLevel, 1)
   );
 
   const [crosswords, setCrosswords] = useState(generateLibrary(
@@ -88,7 +91,7 @@ export default function App() {
       minLength: 3,
       maxLength: 5,
       formatter: (word) => word.toUpperCase(),
-    }), 10, 3, 5)
+    }), maxLevel, gamePerLevel, 5)
   );
 
   // const [crosswords, setCrosswords] = useState(wordsList);
@@ -142,7 +145,7 @@ export default function App() {
         <Text>Score: {disScore}</Text>
       </View>
 
-      <DisplayGame level = {disLevel}
+      <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
                    score = {disScore} computeScore = {computeScore}
                    crosswordsProc = {crosswords}
                    master = {master}

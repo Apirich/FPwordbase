@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity } from "react-native";
 
+import wordExists from "word-exists";
+
 const screenDimensions = Dimensions.get("screen");
 
 const generateGrid = (crosswordsProc) => {
@@ -24,21 +26,25 @@ const generateMasterCell = (master) => {
     return masterCell;
 };
 
-const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
+const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crosswordsProc, master}) => {
     const [numGame, setNumGame] = useState(0);
-    const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc[level - 1][numGame]));
-    const [disMaster, setDisMaster] = useState(generateMasterCell(master[level - 1][numGame]));
+    const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc[(level - 1) % maxLevel][numGame]));
+    const [disMaster, setDisMaster] = useState(generateMasterCell(master[(level - 1) % maxLevel][numGame]));
     const [disMatch, setDisMatch] = useState([]);
     const [disStatus, setDisStatus] = useState("Need to be solved!");
 
-    console.log(master[level - 1][numGame]);
+    console.log(master[(level - 1) % maxLevel][numGame]);
+
+    const [crosswordData, setCrosswordData] = useState(crosswordsProc[(level - 1) % maxLevel][numGame]);
+    // console.log(crosswordData);
 
     // Update grid/master if crosswordsProc/master are updated/changed in words.js
     // and if numGame/level are updated/changed (generate New Game/level up)
     useEffect(() => {
-        setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
-        setDisMaster(generateMasterCell(master[level - 1][numGame]));
-    }, [crosswordsProc, master, numGame, level]);
+        setDisGrid(generateGrid(crosswordsProc[(level - 1) % maxLevel][numGame]));
+        setDisMaster(generateMasterCell(master[(level - 1) % maxLevel][numGame]));
+        setCrosswordData(crosswordsProc[(level - 1) % maxLevel][numGame]);
+    }, [crosswordsProc, master, numGame, level, maxLevel, gamePerLevel]);
 
     useEffect(() => {
         setDisStatus("Need to be solved!");
@@ -56,28 +62,53 @@ const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
         setDisMaster(newMaster);
     };
 
-    const handleVerify = () => {
+    const handleVerify = (cwData) => {
+        console.log(cwData);
+
         const verifyMaster = [...disMaster].join("");
         const verifyGrid = [...disGrid];
 
-        if(verifyMaster === master[level - 1][numGame]){
+        if(verifyMaster === master[(level - 1) % maxLevel][numGame]){
             setDisStatus("Nailed it!");
             computeScore(score + 5);
         }else{
             setDisStatus("Try again!");
-        }
 
-        let match = new Set(disMatch);
+            let invalidInput = false;
 
-        for(let i = 0; i < verifyGrid.length; ++i){
-            for(let j = 0; j < verifyGrid[i].length; ++j){
-                if(verifyGrid[i][j] !== "" && master[level - 1][numGame].includes(verifyGrid[i][j])){
-                    match.add(verifyGrid[i][j]);
+            cwData.forEach(({direction, word, xPos, yPos}, i) => {
+                let inputWord = "";
+
+                for(let j = 0; j < word.length; ++j){
+                    if(direction === "A"){
+                        inputWord += verifyGrid[yPos][xPos + j];
+                    }else{
+                        inputWord += verifyGrid[yPos + j][xPos];
+                    }
                 }
+
+                if(inputWord !== "" && !wordExists(inputWord)){
+                    alert("Ouch! One of your input word is not in the dictionary!");
+                    invalidInput = true;
+                    return;
+                }
+            });
+
+            // Only verify matching letters if all inputs are English word (valid)
+            if(!invalidInput){
+                let match = new Set(disMatch);
+
+                for(let i = 0; i < verifyGrid.length; ++i){
+                    for(let j = 0; j < verifyGrid[i].length; ++j){
+                        if(verifyGrid[i][j] !== "" && master[(level - 1) % maxLevel][numGame].includes(verifyGrid[i][j])){
+                            match.add(verifyGrid[i][j]);
+                        }
+                    }
+                }
+
+                setDisMatch(Array.from(match).sort());
             }
         }
-
-        setDisMatch(Array.from(match).sort());
     };
 
     const handleReset = () => {
@@ -94,11 +125,11 @@ const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
         }
 
         setDisGrid(resetGrid);
-        setDisMaster(generateMasterCell(master[level - 1][numGame]));
+        setDisMaster(generateMasterCell(master[(level - 1) % maxLevel][numGame]));
     };
 
     const handleGenerate = () => {
-        if(numGame < 2){
+        if(numGame < gamePerLevel - 1){
             setNumGame(numGame + 1);
         }else{
             setNumGame(0);
@@ -117,7 +148,7 @@ const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
                 <View key = {i} style = {styles.row}>
                     {row.map((cell, j) => (
                         <View key = {j} style = {styles.wordCell}>
-                            {crosswordsProc[level - 1][numGame].map(({xPos, yPos, direction}, ind) => {
+                            {crosswordData.map(({xPos, yPos, direction}, ind) => {
                                 return i === yPos && j === xPos ?
                                 <Text key = {ind + direction} style = {styles.title}>{ind + 1 + direction}</Text>
                                 :
@@ -175,7 +206,7 @@ const DisplayGame = ({level, score, computeScore, crosswordsProc, master}) => {
             </View>
 
             <View style = {styles.buttonCon}>
-                <TouchableOpacity style = {styles.button} onPress = {() => handleVerify()} disabled = {disStatus === "Nailed it!" ? true : false}>
+                <TouchableOpacity style = {styles.button} onPress = {() => handleVerify(crosswordData)} disabled = {disStatus === "Nailed it!" ? true : false}>
                     <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Verify</Text>
                 </TouchableOpacity>
                 <View style = {styles.gap}/>

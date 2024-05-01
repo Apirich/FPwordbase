@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
 
 const readFile = async () => {
     try{
@@ -9,6 +9,8 @@ const readFile = async () => {
 
         // Download if file not exist / open file
         if(!fileInfo.exists){ // Not exist
+            let fileUri;
+
             try{ // Try to download
                 const downLink = "https://www.mit.edu/~ecprice/wordlist.10000";
 
@@ -16,29 +18,32 @@ const readFile = async () => {
                     downLink,
                     filePath
                 );
-                const { fileUri } = await downloadResumable.downloadAsync();
-
-                return fileUri;
+                fileUri = await downloadResumable.downloadAsync();
             }catch(error){
                 console.error("readFile.js: File not exists, download error:", error);
             }
 
             try{ // Try to open
                 const fileContent = await FileSystem.readAsStringAsync(fileUri);
-                return fileContent;
+                const fileArray = fileContent.split("\n");
+                return fileArray;
             }catch(error){
                 console.error("readFile.js: File not exists, opening error:", error);
+                return [];
             }
         }else{ // Exist
             try{
                 const fileContent = await FileSystem.readAsStringAsync(filePath);
-                return fileContent;
+                const fileArray = fileContent.split("\n");
+                return fileArray;
             }catch(error){
                 console.error("readFile.js: File exists, opening error:", error);
+                return [];
             }
         }
     }catch(error){
         console.error("readFile.js - readFile() ERROR:", error);
+        return [];
     }
 
 

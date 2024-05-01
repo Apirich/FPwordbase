@@ -2,13 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View, Text } from "react-native";
 import { useEffect, useState } from "react";
 
-// import { wordsList, masterList } from "./src/helpers/words";
-
-// import { processLibrary } from "./src/helpers/words";
 import DisplayGame from "./src/components/grid";
 
 import { getScore, updateScore } from "./src/database/dbQueries";
-
 import { generate, count } from "random-words";
 
 // const callProcessLibrary = async () => {
@@ -23,7 +19,6 @@ import { generate, count } from "random-words";
 //     console.error("Error call: ", error);
 //   }
 // };
-
 
 const randomPick = (itemList, loopTime, libName) => {
   while(itemList.length < loopTime){

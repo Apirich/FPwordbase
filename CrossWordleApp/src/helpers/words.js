@@ -2,8 +2,10 @@ import readFile from "./readFile";
 
 const processLibrary = async () => {
   try{
-      const fileData = await readFile();
-      const fileArray = fileData.split("\n");
+      // const fileData = await readFile();
+      // const fileArray = fileData.split("\n");
+
+      const fileArray = await readFile();
 
       const lib34 = [];
       const lib45 = [];

@@ -1,7 +1,26 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity } from "react-native";
 
+// word-exists requires external API (only ONLINE)
 import wordExists from "word-exists";
+
+// user will be able to use the app OFFLINE with readFile
+// however mit.edu not cover enough words, so use word-exists package instead
+// code is here for completeness only
+// import readFile from "../helpers/readFile2";
+
+// // use with readFile
+// const procReadFile = readFile;
+// let wordLibrary;
+
+// // use with readFile
+// procReadFile()
+// .then(wordList =>{
+//     wordLibrary = wordList;
+// })
+// .catch(error => {
+//     console.error("grid.js - procReadFile() ERROR: ", error);
+// })
 
 const screenDimensions = Dimensions.get("screen");
 
@@ -35,10 +54,8 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
     const [solvedGame, setSolvedGame] = useState([gamePerLevel]);
 
     console.log(master[(level - 1) % maxLevel][numGame]);
-    // console.log(level, numGame);
 
     const [crosswordData, setCrosswordData] = useState(crosswordsProc[(level - 1) % maxLevel][numGame]);
-    // console.log(crosswordData);
 
     // Update grid/master if crosswordsProc/master are updated/changed in words.js
     // and if numGame/level are updated/changed (generate New Game/level up)
@@ -85,25 +102,37 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
 
             let invalidInput = false;
 
-            cwData.forEach(({direction, word, xPos, yPos}, i) => {
+            for(let i = 0; i < cwData.length; ++i){
                 let inputWord = "";
 
-                for(let j = 0; j < word.length; ++j){
-                    if(direction === "A"){
-                        inputWord += verifyGrid[yPos][xPos + j];
+                for(let j = 0; j < cwData[i]["word"].length; ++j){
+                    if(cwData[i]["direction"] === "A"){
+                        inputWord += verifyGrid[cwData[i]["yPos"]][cwData[i]["xPos"] + j];
                     }else{
-                        inputWord += verifyGrid[yPos + j][xPos];
+                        inputWord += verifyGrid[cwData[i]["yPos"] + j][cwData[i]["xPos"]];
                     }
                 }
 
+                // Use with wordExists package (only ONLINE)
                 if(inputWord !== "" && !wordExists(inputWord)){
                     alert("Ouch! One of your input word is not in the dictionary!");
                     invalidInput = true;
-                    return;
+                    break;
                 }
-            });
 
-            // Only verify matching letters if all inputs are English word (valid)
+                // // Use with wordLibrary (user can use the app OFFLINE)
+                // // The wordlist from mit.edu is not enough word so use wordExists package instead
+                // // wordExists requires external API
+                // // code is here for completenese only
+                // if(inputWord !== "" && !wordLibrary.includes(inputWord.toLowerCase())){
+                //     alert("Ouch! One of your input word is not in the dictionary!");
+                //     invalidInput = true;
+                //     break;
+                // }
+            }
+
+            // Only verify matching letters if input are not empty
+            // and all inputs are English word (valid)
             if(!invalidInput){
                 let match = new Set(disMatch);
 
@@ -142,12 +171,13 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
         let solvedGameArr = [...solvedGame];
         let nGame = numGame;
 
-        console.log(solvedGame, gamePerLevel);
-        console.log(numGame, nGame);
+        // console.log(solvedGame, gamePerLevel);
+        // console.log(numGame, nGame);
 
         // Only incase when gamePerLevel <= score to level up
         // Not apply in this App!!!
         // Just here for completeness!!!
+        // But DO NOT command out since it guarantee no crash
         if(solvedGameArr.length >= gPerLevel + 1){
             solvedGameArr = [gPerLevel];
             setSolvedGame([gPerLevel]);
@@ -188,8 +218,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crossw
             }
         }
 
-        // setDisGrid(generateGrid(crosswordsProc[level - 1][numGame]));
-        // setDisMaster(generateMasterCell(master[level - 1][numGame]));
         setDisMatch("");
         setDisStatus("Need to be solved!");
     };

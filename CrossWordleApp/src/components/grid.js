@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 
+// import { ScrollView } from "react-native-gesture-handler";
 // word-exists requires external API (only ONLINE)
 import wordExists from "word-exists";
 
@@ -293,54 +294,65 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
     );
 
     return(
-        <View style = {styles.container}>
-            {displayGrid()}
-            {displayMatch()}
-            {displayMaster()}
+        <KeyboardAvoidingView style = {styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <ScrollView contentContainerStyle = {styles.scrollContainer} keyboardShouldPersistTaps = "handled">
+                <View style = {styles.content}>
+                    {displayGrid()}
+                    {displayMatch()}
+                    {displayMaster()}
 
-            {/* As RN components, keyboard will automatically pop down after each input */}
-            {/* <DisplayGrid/>
-            <DisplayMaster/> */}
+                    {/* As RN components, keyboard will automatically pop down after each input */}
+                    {/* <DisplayGrid/>
+                    <DisplayMaster/> */}
 
-            <View>
-                <Text>{disStatus}</Text>
-            </View>
+                    <View>
+                        <Text>{disStatus}</Text>
+                    </View>
 
-            <View>
-                <Text>{revealedGame}</Text>
-            </View>
+                    <View>
+                        <Text>{revealedGame}</Text>
+                    </View>
 
+                    <View style = {styles.buttonCon}>
+                        <TouchableOpacity style = {styles.button} onPress = {() => handleVerify(crosswordData)} disabled = {disStatus === "Nailed it!" ? true : false}>
+                            <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Verify</Text>
+                        </TouchableOpacity>
+                        <View style = {styles.gap}/>
 
-            <View style = {styles.buttonCon}>
-                <TouchableOpacity style = {styles.button} onPress = {() => handleVerify(crosswordData)} disabled = {disStatus === "Nailed it!" ? true : false}>
-                    <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Verify</Text>
-                </TouchableOpacity>
-                <View style = {styles.gap}/>
+                        <TouchableOpacity style = {styles.button} onPress = {() => handleReset()} disabled = {disStatus === "Nailed it!" ? true : false}>
+                            <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Reset</Text>
+                        </TouchableOpacity>
+                        <View style = {styles.gap}/>
 
-                <TouchableOpacity style = {styles.button} onPress = {() => handleReset()} disabled = {disStatus === "Nailed it!" ? true : false}>
-                    <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Reset</Text>
-                </TouchableOpacity>
-                <View style = {styles.gap}/>
+                        <TouchableOpacity style = {styles.button} onPress = {() => handleGenerate()}>
+                            <Text style = {styles.buttonText}>New Game</Text>
+                        </TouchableOpacity>
 
-                <TouchableOpacity style = {styles.button} onPress = {() => handleGenerate()}>
-                    <Text style = {styles.buttonText}>New Game</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style = {styles.button} onPress = {() => handleReveal()} disabled = {disRevealStatus === true ? true : false}>
-                    <Text style = {[styles.buttonText, disRevealStatus === true ? styles.disableButtonText : null]}>Reveal</Text>
-                </TouchableOpacity>
-                <View style = {styles.gap}/>
-            </View>
-        </View>
+                        <TouchableOpacity style = {styles.button} onPress = {() => handleReveal()} disabled = {disRevealStatus === true ? true : false}>
+                            <Text style = {[styles.buttonText, disRevealStatus === true ? styles.disableButtonText : null]}>Reveal</Text>
+                        </TouchableOpacity>
+                        <View style = {styles.gap}/>
+                    </View>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
+    },
+
+    scrollContainer: {
+        flexGrow: 1,
+    },
+
+    content: {
+        flex: 1,
+        // backgroundColor: "red",
+        justifyContent: "center",
+        alignItems: "center",
     },
 
     row: {

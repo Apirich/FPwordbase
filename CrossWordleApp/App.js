@@ -1,11 +1,15 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, SafeAreaView, KeyboardAvoidingView, Platform } from "react-native";
 import { useEffect, useState } from "react";
 
 import DisplayGame from "./src/components/grid";
 
 import { getScore, updateScore, getCoin, updateCoin } from "./src/database/dbQueries";
 import { generate, count } from "random-words";
+
+// Import navigation
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator} from "@react-navigation/stack";
 
 
 const randomPick = (itemList, loopTime, libName) => {
@@ -52,6 +56,10 @@ const generateLibrary = (gen, level, game, word) => {
 
   return arrLib;
 };
+
+
+// -------- Navigator --------
+const Stack = createStackNavigator();
 
 export default function App() {
   const maxLevel = 10;
@@ -131,22 +139,26 @@ export default function App() {
   }
 
   return(
-    <View style = {styles.container}>
-      <View style = {styles.scoreLvl}>
-        <Text>Level: {disLevel}</Text>
-        <Text>Score: {disScore}</Text>
-        <Text>Coin: {disCoin}</Text>
-      </View>
+    <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
+      <SafeAreaView style = {styles.safeArea}>
+        <View style = {styles.scoreLvlContainer}>
+          <Text>Level: {disLevel}</Text>
+          <Text>Score: {disScore}</Text>
+          <Text>Coin: {disCoin}</Text>
+        </View>
 
-      <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
-                   score = {disScore} computeScore = {computeScore}
-                   coin = {disCoin} computeCoin = {computeCoin}
-                   crosswordsProc = {crosswords}
-                   master = {master}
-      />
+        <View style = {styles.displayGameContainer}>
+          <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
+                      score = {disScore} computeScore = {computeScore}
+                      coin = {disCoin} computeCoin = {computeCoin}
+                      crosswordsProc = {crosswords}
+                      master = {master}
+          />
+        </View>
 
-      <StatusBar style="auto" />
-    </View>
+        <StatusBar style="auto" />
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -158,10 +170,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  scoreLvl: {
+  safeArea: {
+    flex: 1,
+  },
+
+  scoreLvlContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 20,
+    paddingTop: 20,
+    backgroundColor: "white",
+    zIndex: 1,
+  },
+
+  displayGameContainer: {
+    flex: 1,
+    marginTop: 10,
+    zIndex: 0,
   }
 });
 

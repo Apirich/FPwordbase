@@ -4,9 +4,21 @@ import { useEffect, useState } from "react";
 
 import DisplayGame from "./src/components/grid";
 
-import { getScore, updateScore, getCoin, updateCoin } from "./src/database/dbQueries";
+import { getScore, updateScore } from "./src/database/dbQueries";
 import { generate, count } from "random-words";
 
+// const callProcessLibrary = async () => {
+//   try{
+//     const library = await processLibrary();
+
+//     const wTest = library["wordsList"];
+//     const mTest = library["masterList"];
+
+//     return mTest;
+//   }catch(error){
+//     console.error("Error call: ", error);
+//   }
+// };
 
 const randomPick = (itemList, loopTime, libName) => {
   while(itemList.length < loopTime){
@@ -82,8 +94,6 @@ export default function App() {
 
   const [disScore, setDisScore] = useState(0);
   const [disLevel, setDisLevel] = useState(1);
-  const [disCoin, setDisCoin] = useState(10);
-
 
   // Retrieve score from the database, ONLY ONCE when the app start
   useEffect(() => {
@@ -95,13 +105,13 @@ export default function App() {
       console.error("Error getScore() from SQLite:", error);
     });
 
-    getCoin()
-    .then((data) => {
-      setDisCoin(data);
-    })
-    .catch((error) => {
-      console.error("Error getCoin() from SQLite:", error);
-    });
+    // processLibrary()
+    // .then(({wordsList, masterList}) => {
+    //   setTestCross(wordsList);
+    //   setTestMas(masterList);
+    // }).catch(error => {
+    //   console.error("Error processLibrary():", error);
+    // });
   }, []);
 
   // Update score to the database when disScore is changed
@@ -114,20 +124,13 @@ export default function App() {
     });
   }, [disScore]);
 
-  // Update coin to the database when disCoin is changed
-  useEffect(() => {
-    updateCoin(disCoin)
-    .catch((error) => {
-      console.error('Error updating coin:', error);
-    });
-  }, [disCoin]);
+  // useEffect(() => {
+  //   setDisLevel(1 + Math.floor(disScore/10));
+  // }, [disScore]);
+
 
   const computeScore = (score) => {
     setDisScore(score);
-  }
-
-  const computeCoin = (coin) => {
-    setDisCoin(coin);
   }
 
   return(
@@ -135,12 +138,10 @@ export default function App() {
       <View style = {styles.scoreLvl}>
         <Text>Level: {disLevel}</Text>
         <Text>Score: {disScore}</Text>
-        <Text>Coin: {disCoin}</Text>
       </View>
 
       <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
                    score = {disScore} computeScore = {computeScore}
-                   coin = {disCoin} computeCoin = {computeCoin}
                    crosswordsProc = {crosswords}
                    master = {master}
       />

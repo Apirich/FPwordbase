@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity } from "react-native";
 
 // word-exists requires external API (only ONLINE)
 import wordExists from "word-exists";
@@ -45,19 +45,13 @@ const generateMasterCell = (master) => {
     return masterCell;
 };
 
-const DisplayGame = ({level, maxLevel, gamePerLevel,
-                      score, computeScore,
-                      coin, computeCoin,
-                      crosswordsProc,
-                      master}) => {
+const DisplayGame = ({level, maxLevel, gamePerLevel, score, computeScore, crosswordsProc, master}) => {
     const [numGame, setNumGame] = useState(0);
     const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc[(level - 1) % maxLevel][numGame]));
     const [disMaster, setDisMaster] = useState(generateMasterCell(master[(level - 1) % maxLevel][numGame]));
     const [disMatch, setDisMatch] = useState([]);
     const [disStatus, setDisStatus] = useState("Need to be solved!");
     const [solvedGame, setSolvedGame] = useState([gamePerLevel]);
-    const [revealedGame, setRevealedGame] = useState("");
-    const [disRevealStatus, setDisRevealStatus] = useState(false);
 
     console.log(master[(level - 1) % maxLevel][numGame]);
 
@@ -99,7 +93,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
         if(verifyMaster === master[(level - 1) % maxLevel][numGame]){
             setDisStatus("Nailed it!");
             computeScore(score + 5);
-            computeCoin(coin + 5);
 
             // Add new solved game to solvedGame[]
             verifySolvedGame.push(numGame);
@@ -227,19 +220,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
         setDisMatch("");
         setDisStatus("Need to be solved!");
-        setRevealedGame("");
-        setDisRevealStatus(false);
-    };
-
-
-    const handleReveal = () => {
-        if(coin >= 10){
-            setRevealedGame(master[(level - 1) % maxLevel][numGame]);
-            setDisRevealStatus(true);
-            computeCoin(coin - 10);
-        }else{
-            alert("Insufficient, you need at least 10 coins!");
-        }
     };
 
 
@@ -306,11 +286,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                 <Text>{disStatus}</Text>
             </View>
 
-            <View>
-                <Text>{revealedGame}</Text>
-            </View>
-
-
             <View style = {styles.buttonCon}>
                 <TouchableOpacity style = {styles.button} onPress = {() => handleVerify(crosswordData)} disabled = {disStatus === "Nailed it!" ? true : false}>
                     <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Verify</Text>
@@ -324,10 +299,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
                 <TouchableOpacity style = {styles.button} onPress = {() => handleGenerate()}>
                     <Text style = {styles.buttonText}>New Game</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style = {styles.button} onPress = {() => handleReveal()} disabled = {disRevealStatus === true ? true : false}>
-                    <Text style = {[styles.buttonText, disRevealStatus === true ? styles.disableButtonText : null]}>Reveal</Text>
                 </TouchableOpacity>
                 <View style = {styles.gap}/>
             </View>

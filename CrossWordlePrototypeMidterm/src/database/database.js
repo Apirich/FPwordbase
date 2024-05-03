@@ -9,13 +9,6 @@ db.transaction((tx) => {
   );
 });
 
-// Create a table to store the coin if it doesn't exist
-db.transaction((tx) => {
-  tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS coins (id INTEGER PRIMARY KEY AUTOINCREMENT, value INTEGER)"
-  );
-});
-
 
 // db.transaction((tx) => {
 //   // Drop the scores table (if it exists)

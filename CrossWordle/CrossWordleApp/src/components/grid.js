@@ -74,6 +74,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
     useEffect(() => {
         setDisStatus("Need to be solved!");
+        setDisMatch([]);
     }, [level]);
 
     useEffect(() => {

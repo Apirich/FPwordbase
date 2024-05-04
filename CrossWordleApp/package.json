@@ -22,7 +22,8 @@
     "react-native": "0.73.6",
     "react-native-gesture-handler": "^2.16.1",
     "react-native-web": "~0.19.6",
-    "word-exists": "^1.0.0"
+    "word-exists": "^1.0.0",
+    "@react-native-community/netinfo": "11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

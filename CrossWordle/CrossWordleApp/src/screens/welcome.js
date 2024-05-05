@@ -12,7 +12,7 @@ WelcomeScreen = ({navigation, route}) => {
           <Text>Welcom to The Crosswordle App</Text>
           <Text>Please Choose Gaming Mode</Text>
 
-          <TouchableOpacity onPress = {() => navigation.navigate("Login")} disabled = {internetChecking ? false : true}>
+          <TouchableOpacity onPress = {() => navigation.navigate("OnlineMode")} disabled = {internetChecking ? false : true}>
             <Text style = {[styles.buttonText, internetChecking ? null : styles.disableButtonText]}>Online Mode</Text>
           </TouchableOpacity>
 

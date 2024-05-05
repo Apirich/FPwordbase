@@ -10,7 +10,10 @@ import NetInfo from '@react-native-community/netinfo';
 // Import screens
 import SplashScreen from "./src/screens/splash";
 import WelcomeScreen from "./src/screens/welcome";
+import OnlineModeScreen from "./src/screens/onlineMode";
 import LoginScreen from "./src/screens/login";
+import SignupScreen from "./src/screens/signup";
+import OnlineGameScreen from "./src/screens/onlineGame";
 import OfflineGameScreen from "./src/screens/offlineGame";
 
 
@@ -57,7 +60,19 @@ export default function App(){
                       initialParams = {{internetChecking}}
         />
 
+        <Stack.Screen name = "OnlineMode" component = {OnlineModeScreen}
+                      options = {{headerShown: false}}
+        />
+
         <Stack.Screen name = "Login" component = {LoginScreen}
+                      options = {{headerShown: false}}
+        />
+
+        <Stack.Screen name = "Signup" component = {SignupScreen}
+                      options = {{headerShown: false}}
+        />
+
+        <Stack.Screen name = "OnlineGame" component = {OnlineGameScreen}
                       options = {{headerShown: false}}
         />
 

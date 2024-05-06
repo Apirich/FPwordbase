@@ -33,7 +33,7 @@ LoginScreen = ({navigation, route}) => {
             <Text style = {[styles.buttonText]}>Login</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress = {() => navigation.goBack()}>
+          <TouchableOpacity onPress = {() => navigation.navigate("OnlineMode")}>
             <Text style = {[styles.buttonText]}>Back</Text>
           </TouchableOpacity>
     </SafeAreaView>

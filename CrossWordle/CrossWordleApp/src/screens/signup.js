@@ -39,7 +39,7 @@ SignupScreen = ({navigation, route}) => {
                 <Text style = {[styles.buttonText]}>Sign Up</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress = {() => navigation.goBack()}>
+            <TouchableOpacity onPress = {() => navigation.navigate("OnlineMode")}>
                 <Text style = {[styles.buttonText]}>Back</Text>
             </TouchableOpacity>
       </SafeAreaView>

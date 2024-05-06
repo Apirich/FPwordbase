@@ -1,28 +1,41 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, TouchableOpacity } from "react-native";
+import { useNavigationState } from "@react-navigation/native";
+
+import { checkTokenExpiration } from "../database/fetchBackend";
 
 const screenDimensions = Dimensions.get("screen");
 
+
+// const getCurrentRouteName = () => {
+//   const navigationState = useNavigationState(state => state);
+//   return navigationState.routes[navigationState.index].name;
+// };
+
+
 // -------- Online Mode Screen --------
 OnlineModeScreen = ({navigation, route}) => {
-    return(
-      <View style = {styles.container}>
-        <SafeAreaView>
-          <Text>Please Sign up or Login</Text>
+  // const currentRouteName = getCurrentRouteName();
+  // console.log("Current route name:", currentRouteName);
 
-          <TouchableOpacity onPress = {() => navigation.navigate("Login")}>
-            <Text style = {[styles.buttonText]}>Login</Text>
-          </TouchableOpacity>
+  return(
+    <View style = {styles.container}>
+      <SafeAreaView>
+        <Text>Please Sign up or Login</Text>
 
-          <TouchableOpacity onPress = {() => navigation.navigate("Signup")}>
-            <Text style = {[styles.buttonText]}>Sign Up</Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress = {() => checkTokenExpiration(navigation, "OnlineModeScreen")}>
+          <Text style = {[styles.buttonText]}>Login</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress = {() => navigation.goBack()}>
-            <Text style = {[styles.buttonText]}>Home</Text>
-          </TouchableOpacity>
-      </SafeAreaView>
-      </View>
-    );
+        <TouchableOpacity onPress = {() => navigation.navigate("Signup")}>
+          <Text style = {[styles.buttonText]}>Sign Up</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress = {() => navigation.navigate("Welcome")}>
+          <Text style = {[styles.buttonText]}>Home</Text>
+        </TouchableOpacity>
+    </SafeAreaView>
+    </View>
+  );
 };
 
 // -------- Styles --------

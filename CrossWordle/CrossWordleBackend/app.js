@@ -185,9 +185,17 @@ app.post("/login", (req, res) => {
           return res.status(401).json({ error: "PLogin: Invalid password" });
         }
 
+        // Token expiration time
+        const expTime = "1h";
+
+        // Calculate the expiration timestamp
+        // Convert current time from milSecond to second, and expTime to seconds
+        const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600
+
         // Generate JWT token
-        const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: "1h" });
-        res.json({ message: "PLogin: Login successful with token", token });
+        const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: expTime });
+
+        res.json({ message: "PLogin: Login successful with token", token, expTimestamp });
       });
     });
   });

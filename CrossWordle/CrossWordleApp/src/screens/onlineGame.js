@@ -1,12 +1,13 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
+import { useNavigationState } from "@react-navigation/native";
 
 import { generate, count } from "random-words";
 // import { getScore, updateScore, getCoin, updateCoin } from "../database/dbQueries";
 
 import DisplayGame from "../components/grid";
 
-import { getScoreCoin, updateScore, updateCoin, handleLogout } from "../database/fetchBackend";
+import { getScoreCoin, updateScore, updateCoin, handleLogout, checkTokenExpiration } from "../database/fetchBackend";
 
 const screenDimensions = Dimensions.get("screen");
 
@@ -60,6 +61,12 @@ const randomPick = (itemList, loopTime, libName) => {
   };
 
 
+  const getCurrentRouteName = () => {
+    const navigationState = useNavigationState(state => state);
+    return navigationState.routes[navigationState.index].name;
+  };
+
+
   // -------- Online Game Screen --------
   OnlineGameScreen = ({navigation, route}) => {
     const maxLevel = 10;
@@ -92,6 +99,9 @@ const randomPick = (itemList, loopTime, libName) => {
     const [disLevel, setDisLevel] = useState(1);
     const [disCoin, setDisCoin] = useState(10);
 
+    // const currentRouteName = getCurrentRouteName();
+    // console.log("Current route name ONLINEGAME:", currentRouteName);
+
 
     // Retrieve score from the database, ONLY ONCE when the app start
     useEffect(() => {
@@ -109,25 +119,53 @@ const randomPick = (itemList, loopTime, libName) => {
 
     // Update score to the database when disScore is changed
     useEffect(() => {
-      setDisLevel(1 + Math.floor(disScore/10));
+      checkTokenExpiration("", "OnlineGameScreen")
+      .then((isTokenExpired) => {
+        if(isTokenExpired){
+          alert("Your login session has expired, latest score has not been updated! Please login again!");
+          navigation.navigate("Login");
+        }else{
+          setDisLevel(1 + Math.floor(disScore/10));
 
-      updateScore(disScore)
+           updateScore(disScore)
+          .then(() => {
+            console.log("onlineGame.js: Score updated successfully");
+          })
+          .catch((error) => {
+            console.error("onlineGame.js - error updateScore()", error);
+          });
+        }
+      })
       .then(() => {
         console.log("onlineGame.js: Score updated successfully");
       })
       .catch((error) => {
-        console.error("onlineGame.js - error updateScore()", error);
+        console.error("onlineGame.js - error Score checkTokenExpiration()", error);
       });
     }, [disScore]);
 
     // Update coin to the database when disCoin is changed
     useEffect(() => {
-      updateCoin(disCoin)
+      checkTokenExpiration("", "OnlineGameScreen")
+      .then((isTokenExpired) => {
+        if(isTokenExpired){
+          alert("Your login session has expired, latest coin has not been updated! Please login again!");
+          navigation.navigate("Login");
+        }else{
+          updateCoin(disCoin)
+          .then(() => {
+            console.log("onlineGame.js: Coin updated successfully");
+          })
+          .catch((error) => {
+            console.error("onlineGame.js - error updateCoin()", error);
+          });
+        }
+      })
       .then(() => {
         console.log("onlineGame.js: Coin updated successfully");
       })
       .catch((error) => {
-        console.error("onlineGame.js - error updateCoin()", error);
+        console.error("onlineGame.js - error Coin checkTokenExpiration()", error);
       });
     }, [disCoin]);
 
@@ -142,6 +180,10 @@ const randomPick = (itemList, loopTime, libName) => {
     return(
       <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
         <SafeAreaView style = {styles.safeArea}>
+          <TouchableOpacity onPress = {() => navigation.navigate("OnlineMode")}>
+            <Text style = {[styles.buttonText]}>Home</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity onPress = {() => handleLogout({navigation})}>
             <Text style = {[styles.buttonText]}>Logout</Text>
           </TouchableOpacity>

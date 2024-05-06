@@ -69,7 +69,7 @@ export const handleLogin = ({email, password, navigation}) => {
         }
     }).then((data) => {
         console.log("backendQueries.js - handleLogin(): token:", data.token);
-        return AsyncStorage.setItem("token", data.token);
+        return AsyncStorage.setItem("token", data.token).then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()));
     }).then(() => {
         navigation.navigate("OnlineGame");
     }).catch((error) => {
@@ -82,15 +82,39 @@ export const handleLogin = ({email, password, navigation}) => {
 };
 
 
+export const checkTokenExpiration = (navigation, currentRouteName) => {
+    return AsyncStorage.getItem("tokenExpTimestamp")
+    .then((tokenExpTimestamp) => {
+        console.log("screen", currentRouteName);
+        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000)){
+            if(currentRouteName === "OnlineModeScreen"){
+                navigation.navigate("OnlineGame");
+            }else if(currentRouteName === "OnlineGameScreen"){
+                return false;
+            }
+        }else{
+            if(currentRouteName === "OnlineModeScreen"){
+                navigation.navigate("Login");
+            }else if(currentRouteName === "OnlineGameScreen"){
+                return true;
+            }
+        }
+    })
+    .catch(error => {
+        console.error("backendQueries.js - checkTokenExpiration(): Error checking token expiration:", error);
+    });
+};
+
+
 export const handleLogout = ({navigation}) => {
-    AsyncStorage.removeItem("token")
+    AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
     .then(() => {
-        navigation.navigate("Login");
+        navigation.navigate("OnlineMode");
     })
     .catch(error => {
         console.error("backendQueries.js - handleLogout(): Error logging out:", error);
     });
-  };
+};
 
 
 export const getScoreCoin = () => {

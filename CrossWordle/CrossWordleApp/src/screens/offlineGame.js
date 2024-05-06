@@ -139,7 +139,7 @@ const randomPick = (itemList, loopTime, libName) => {
     return(
       <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
         <SafeAreaView style = {styles.safeArea}>
-          <TouchableOpacity onPress = {() => navigation.goBack()}>
+          <TouchableOpacity onPress = {() => navigation.navigate("Welcome")}>
             <Text style = {[styles.buttonText]}>Home</Text>
           </TouchableOpacity>
 

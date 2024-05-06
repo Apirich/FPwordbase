@@ -1,6 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const mysql = require("mysql2");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+
+const generateSecretKey = () => {
+  return crypto.randomBytes(64).toString("hex");
+};
+
+const secretKey = generateSecretKey();
+console.log("Generated Secret Key:", secretKey);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,6 +25,24 @@ const pool = mysql.createPool({
   connectionLimit: 100
 });
 
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  // Split the "Bearer" prefix
+  const token = req.headers["authorization"].split(" ")[1];
+  if (!token) return res.status(403).json({ error: "No token provided" });
+
+  jwt.verify(token, secretKey, (error, decoded) => {
+    if(error){
+      console.log("verifyToken Error: ", error);
+      return res.status(401).json({ error: "Failed to authenticate token" });
+    }
+
+    req.userId = decoded.id;
+    next();
+  });
+};
+
 // // TEST Attempt to acquire a connection from the pool
 // pool.getConnection((err, connection) => {
 //   if(err){
@@ -28,27 +55,24 @@ const pool = mysql.createPool({
 // });
 
 
-// Listen for the 'connection' event
-pool.on("connection", () => {
-  console.log("Connected to database");
-});
-
-// Optional: Listen for the 'error' event to handle connection errors
+// Listen for the "error" event to handle connection errors
 pool.on("error", (err) => {
   console.error("Error connecting to database:", err);
 });
 
 
-// ---------
+// -------- ENDPOINTS --------
+// -------- Get / --------
 app.get("/", (req, res) => {
     console.log("Got a request");
 
     res.send(JSON.stringify({success:1}));
 });
 
-// User Sign-up Endpoint
+
+// -------- Post Signup --------
 app.post("/signup", (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, score, coin } = req.body;
 
   console.log("Receive signup request");
 
@@ -63,25 +87,77 @@ app.post("/signup", (req, res) => {
 
       // Insert user into database
       connection.query("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [username, email, hash], (error, results) => {
-        // Release the connection back to the pool
-        connection.release();
-
         if(error){
           if(error.code === "ER_DUP_ENTRY"){
-            return res.status(400).json({ error: "PSignup: User already exists" });
-          }
+            connection.rollback(() => {
+              // Release the connection back to the pool
+              connection.release();
+              return res.status(400).json({ error: "PSignup: User already exists" });
+            });
+          }else{
+            console.error("Error executing query:", error);
 
-          console.error("Error executing query:", error);
-          return res.status(500).json({ error: "PSignup: Internal Server Error" });
+            connection.rollback(() => {
+              // Release the connection back to the pool
+              connection.release();
+              return res.status(500).json({ error: "PSignup - insert user: Internal Server Error" });
+            });
+          }
         }
 
-        res.status(201).json({ message: "PSignup: User created successfully" });
+        // Get the ID of the logging in user
+        const userId = results.insertId;
+
+        // Insert initial score into the scores table
+        connection.query("INSERT INTO scores (user_id, score) VALUES (?, ?)", [userId, score], (error) => {
+          if(error){
+            console.error("PSignup: Error inserting score:", error);
+
+            connection.rollback(() => {
+              // Release the connection back to the pool
+              connection.release();
+              return res.status(500).json({ error: "PSignup - insert score: Internal Server Error" });
+            });
+          }
+
+          // Insert initial coins into the coins table
+          connection.query("INSERT INTO coins (user_id, coin) VALUES (?, ?)", [userId, coin], (error) => {
+            if(error){
+              console.error("PSignup: Error inserting coins:", error);
+
+              connection.rollback(() => {
+                // Release the connection back to the pool
+                connection.release();
+                return res.status(500).json({ error: "PSignup - insert coin: Internal Server Error" });
+              });
+            }
+
+            // Commit the transaction
+            connection.commit((error) => {
+              if(error){
+                console.error("PSignup - Error committing transaction:", error);
+
+                connection.rollback(() => {
+                  // Release the connection back to the pool
+                  connection.release();
+                  return res.status(500).json({ error: "PSignup - committing: Internal Server Error" });
+                });
+              }
+
+              // Release the connection back to the pool
+              connection.release();
+
+              res.status(201).json({ message: "PSignup: User created successfully" });
+            });
+          });
+        });
       });
     });
   });
 });
 
-// User Log-in Endpoint
+
+// -------- Post login --------
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -104,47 +180,139 @@ app.post("/login", (req, res) => {
       }
 
       // Compare password
-      bcrypt.compare(password, results[0].password, (err, result) => {
-        if(err || !result){
+      bcrypt.compare(password, results[0].password, (error, result) => {
+        if(error || !result){
           return res.status(401).json({ error: "PLogin: Invalid password" });
         }
-        res.json({ message: "PLogin: Login successful" });
+
+        // Generate JWT token
+        const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: "1h" });
+        res.json({ message: "PLogin: Login successful with token", token });
       });
     });
   });
 });
 
 
+// -------- Get score --------
+app.get("/score", verifyToken, (req, res) => {
+  const userId = req.userId;
+
+  console.log("Receive getScore request");
+
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      console.error("GScore POOL CONNECTION: Error acquiring connection:", error);
+      return res.status(500).json({ error: "GScore POOL CONNECTION: Internal Server Error" });
+    }
+
+    // Retrieve score from the database
+    connection.query("SELECT score FROM scores WHERE user_id = ?", [userId], (error, results) => {
+      // Release the connection back to the pool
+      connection.release();
+
+      if(error){
+        return res.status(500).json({ error: "GScore: Error retrieving score" });
+      }
+
+      if(results.length === 0){
+        return res.status(404).json({ error: "GScore: Score not found for this user" });
+      }
+
+      const score = results[0].score;
+      res.json({score});
+    });
+  });
+});
 
 
+// -------- Get coin --------
+app.get("/coin", verifyToken, (req, res) => {
+  const userId = req.userId;
+
+  console.log("Receive getCoin request");
+
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      console.error("GCoin POOL CONNECTION: Error acquiring connection:", error);
+      return res.status(500).json({ error: "GCoin POOL CONNECTION: Internal Server Error" });
+    }
+
+    // Retrieve coin from the database
+    connection.query("SELECT coin FROM coins WHERE user_id = ?", [userId], (error, results) => {
+      // Release the connection back to the pool
+      connection.release();
+
+      if(error){
+        return res.status(500).json({ error: "GCoin: Error retrieving coin" });
+      }
+
+      if(results.length === 0){
+        return res.status(404).json({ error: "GCoin: Coin not found for this user" });
+      }
+
+      const coin = results[0].coin;
+      res.json({coin});
+    });
+  });
+});
 
 
-// app.get("/coin", (req, res) => {
-//     console.log("searchResults: Got a request", req.query);
+// -------- Update score --------
+app.post("/updateScore", verifyToken, (req, res) => {
+  const userId = req.userId;
+  const {score} = req.body;
 
-//     res.send(JSON.stringify([{lat: 33.79043, long: -117.96768, bizName: "Hair Salon", uri: "./assets/hairSalon.jpg", availableServices: ["Hair Wash", "Hair Straightening", "Hair Cut"]},
-//                              {lat: 33.77351, long: -117.9712898333, bizName: "Nail Salon", uri: "./assets/nailSalon.jpg", availableServices: ["French Manicure", "Gel Manicure", "Shellac Manicure"]},
-//                              {lat: 33.78625, long: -117.9580898333, bizName: "Spa Salon", uri: "./assets/spaSalon.jpg", availableServices: ["Mud Bath", "Salt Scrub", "Seaweed Body Wraps"]}
-//                             ]));
-// })
+  console.log("Receive updateScore request");
 
-// app.post("/score", (req, res) => {
-//     console.log("appointments: Got a request", req.body);
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      return res.status(500).json({ error: "PScore POOL CONNECTION: Internal Server Error" });
+    }
 
-//     res.send(JSON.stringify([{bizName: "Hair Salon", serviceRequest: "Hair Wash", date: "2024-02-12", time: "10:00am"},
-//                              {bizName: "Nail Salon", serviceRequest: "French Manicure", date: "2024-02-29", time: "05:00pm"},
-//                              {bizName: "Spa Salon", serviceRequest: "Mud Bath", date: "2024-03-15", time: "02:00pm"},
-//                             ]));
-// })
+    // Update score in the database
+    connection.query("UPDATE scores SET score = ? WHERE user_id = ?", [score, userId], (error, results) => {
+      // Release the connection back to the pool
+      connection.release();
 
-// app.post("/coin", (req, res) => {
-//     console.log("services: Got a request", req.body);
+      if(error){
+        return res.status(500).json({ error: "PScore: Error updating score" });
+      }
 
-//     res.send(JSON.stringify([{customerName: "John Doe", serviceRequest: "Hair Cut", date: "2024-02-12", time: "10:00am"},
-//                              {customerName: "Jane K", serviceRequest: "French Manicure", date: "2024-02-29", time: "05:00pm"},
-//                              {customerName: "Sophia B", serviceRequest: "Mud Bath", date: "2024-03-15", time: "02:00pm"},
-//                             ]));
-// })
+      res.status(200).json({ message: "PScore: Score updated successfully" });
+    });
+  });
+});
+
+// -------- Update coin --------
+app.post("/updateCoin", verifyToken, (req, res) => {
+  const userId = req.userId;
+  const {coin} = req.body;
+
+  console.log("Receive updateCoin request");
+
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      return res.status(500).json({ error: "PCoin POOL CONNECTION: Internal Server Error" });
+    }
+
+    // Update coin in the database
+    connection.query("UPDATE coins SET coin = ? WHERE user_id = ?", [coin, userId], (error, results) => {
+      // Release the connection back to the pool
+      connection.release();
+
+      if(error){
+        return res.status(500).json({ error: "PCoin: Error updating coin" });
+      }
+
+      res.status(200).json({ message: "PCoin: Coin updated successfully" });
+    });
+  });
+});
 
 
 app.listen(port, () => {

@@ -22,7 +22,7 @@ export const handleSignUp = ({username, email, password, navigation}) => {
             coin: 10,
         }),
     }).then((response) => {
-        console.log("backendQueries.js - handleSignup(): response status:", response.status);
+        console.log("fetchBackend.js - handleSignup(): response status:", response.status);
 
         // If successfully signeup or there is backend internal error signing up
         if(response.status == 201){
@@ -32,7 +32,7 @@ export const handleSignUp = ({username, email, password, navigation}) => {
             throw new Error(response.status);
         }
     }).catch((error) => {
-        console.error("backendQueries.js - handleSignup(): Error signing up:", error)
+        console.error("fetchBackend.js - handleSignup(): Error signing up:", error)
 
         if(error.message == "400"){
             alert("This account already exists!");
@@ -59,7 +59,7 @@ export const handleLogin = ({email, password, navigation}) => {
             password: password
         }),
     }).then((response) => {
-        console.log("backendQueries.js - handleLogin(): response status:", response.status);
+        console.log("fetchBackend.js - handleLogin(): response status:", response.status);
 
         // If successfully login or there is backend internal error logging in
         if(response.status == 200){
@@ -68,12 +68,12 @@ export const handleLogin = ({email, password, navigation}) => {
             throw new Error(response.status);
         }
     }).then((data) => {
-        console.log("backendQueries.js - handleLogin(): token:", data.token);
+        console.log("fetchBackend.js - handleLogin(): token:", data.token);
         return AsyncStorage.setItem("token", data.token).then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()));
     }).then(() => {
         navigation.navigate("OnlineGame");
     }).catch((error) => {
-        console.error("backendQueries.js - handleLogin(): Error logging in:", error)
+        console.error("fetchBackend.js - handleLogin(): Error logging in:", error)
 
         if(error.message == "401"){
             alert("Invalid email or password!");
@@ -85,7 +85,6 @@ export const handleLogin = ({email, password, navigation}) => {
 export const checkTokenExpiration = (navigation, currentRouteName) => {
     return AsyncStorage.getItem("tokenExpTimestamp")
     .then((tokenExpTimestamp) => {
-        console.log("screen", currentRouteName);
         if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000)){
             if(currentRouteName === "OnlineModeScreen"){
                 navigation.navigate("OnlineGame");
@@ -101,7 +100,7 @@ export const checkTokenExpiration = (navigation, currentRouteName) => {
         }
     })
     .catch(error => {
-        console.error("backendQueries.js - checkTokenExpiration(): Error checking token expiration:", error);
+        console.error("fetchBackend.js - checkTokenExpiration(): Error checking token expiration:", error);
     });
 };
 
@@ -112,7 +111,7 @@ export const handleLogout = ({navigation}) => {
         navigation.navigate("OnlineMode");
     })
     .catch(error => {
-        console.error("backendQueries.js - handleLogout(): Error logging out:", error);
+        console.error("fetchBackend.js - handleLogout(): Error logging out:", error);
     });
 };
 
@@ -121,7 +120,7 @@ export const getScoreCoin = () => {
     return AsyncStorage.getItem("token")
     .then((token) => {
         if(!token){
-            throw new Error("backendQueries.js - getScoreCoin(): Token not found");
+            throw new Error("fetchBackend.js - getScoreCoin(): Token not found");
         }
 
         const headers = {
@@ -139,7 +138,7 @@ export const getScoreCoin = () => {
     .then(([scoreData, coinData]) => {
         // Check if responses are successful
         if(!scoreData.ok || !coinData.ok){
-            throw new Error("backendQueries.js - getScoreCoin(): Failed to fetch data");
+            throw new Error("fetchBackend.js - getScoreCoin(): Failed to fetch data");
         }
 
         // Parse response data
@@ -155,7 +154,7 @@ export const updateScore = (score) => {
     return AsyncStorage.getItem("token")
     .then((token) => {
         if(!token){
-            throw new Error("backendQueries.js - updateScore(): Token not found");
+            throw new Error("fetchBackend.js - updateScore(): Token not found");
         }
 
         const headers = {
@@ -173,7 +172,7 @@ export const updateScore = (score) => {
     .then((response) => {
         // Check if the response is successful
         if(!response.ok){
-            throw new Error("backendQueries.js - updateScore(): Failed to update score");
+            throw new Error("fetchBackend.js - updateScore(): Failed to update score");
         }
 
         // Return a success message
@@ -186,7 +185,7 @@ export const updateCoin = (coin) => {
     return AsyncStorage.getItem("token")
     .then((token) => {
         if(!token){
-            throw new Error("backendQueries.js - updateCoin(): Token not found");
+            throw new Error("fetchBackend.js - updateCoin(): Token not found");
         }
 
         const headers = {
@@ -204,7 +203,7 @@ export const updateCoin = (coin) => {
     .then((response) => {
         // Check if the response is successful
         if(!response.ok){
-            throw new Error("backendQueries.js - updateCoin(): Failed to update coin");
+            throw new Error("fetchBackend.js - updateCoin(): Failed to update coin");
         }
 
         // Return a success message

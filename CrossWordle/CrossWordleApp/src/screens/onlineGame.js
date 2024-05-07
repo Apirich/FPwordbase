@@ -1,12 +1,9 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
-import { useNavigationState } from "@react-navigation/native";
 
 import { generate, count } from "random-words";
-// import { getScore, updateScore, getCoin, updateCoin } from "../database/dbQueries";
 
 import DisplayGame from "../components/grid";
-
 import { getScoreCoin, updateScore, updateCoin, handleLogout, checkTokenExpiration } from "../database/fetchBackend";
 
 const screenDimensions = Dimensions.get("screen");
@@ -61,12 +58,6 @@ const randomPick = (itemList, loopTime, libName) => {
   };
 
 
-  const getCurrentRouteName = () => {
-    const navigationState = useNavigationState(state => state);
-    return navigationState.routes[navigationState.index].name;
-  };
-
-
   // -------- Online Game Screen --------
   OnlineGameScreen = ({navigation, route}) => {
     const maxLevel = 10;
@@ -98,10 +89,6 @@ const randomPick = (itemList, loopTime, libName) => {
     const [disScore, setDisScore] = useState(0);
     const [disLevel, setDisLevel] = useState(1);
     const [disCoin, setDisCoin] = useState(10);
-
-    // const currentRouteName = getCurrentRouteName();
-    // console.log("Current route name ONLINEGAME:", currentRouteName);
-
 
     // Retrieve score from the database, ONLY ONCE when the app start
     useEffect(() => {

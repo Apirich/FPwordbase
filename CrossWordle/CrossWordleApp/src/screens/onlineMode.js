@@ -1,22 +1,12 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, TouchableOpacity } from "react-native";
-import { useNavigationState } from "@react-navigation/native";
 
 import { checkTokenExpiration } from "../database/fetchBackend";
 
 const screenDimensions = Dimensions.get("screen");
 
 
-// const getCurrentRouteName = () => {
-//   const navigationState = useNavigationState(state => state);
-//   return navigationState.routes[navigationState.index].name;
-// };
-
-
 // -------- Online Mode Screen --------
 OnlineModeScreen = ({navigation, route}) => {
-  // const currentRouteName = getCurrentRouteName();
-  // console.log("Current route name:", currentRouteName);
-
   return(
     <View style = {styles.container}>
       <SafeAreaView>

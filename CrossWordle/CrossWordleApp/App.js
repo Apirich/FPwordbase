@@ -7,6 +7,10 @@ import { createStackNavigator} from "@react-navigation/stack";
 // Import NetInfo (NetInfo has event listenter)
 import NetInfo from '@react-native-community/netinfo';
 
+// Import AsyncStorage and AppState
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppState } from "react-native";
+
 // Import screens
 import SplashScreen from "./src/screens/splash";
 import WelcomeScreen from "./src/screens/welcome";
@@ -43,8 +47,29 @@ export default function App(){
     }
   });
 
+  // Using AsyncStorage and AppState
+  // To remove token and tokenTimestamp when the App is closed
+  const handleAppClose = (appState) => {
+    if(appState === "background" || appState === "inactive"){
+      AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
+      .then(() => {
+        console.log("App.js - handleAppClose(): Removed token, tokenExpTimestamp");
+      })
+      .catch((error) => {
+        console.error("App.js - handleAppClose(): Error removing item from AsyncStorage:", error);
+      });
+    }
+  };
+
   useEffect(() => {
     processLoading();
+
+    AppState.addEventListener("change", handleAppClose);
+
+    return () => {
+      // Clean up event listener
+      AppState.removeEventListener("change", handleAppClose);
+    };
   }, []);
 
 

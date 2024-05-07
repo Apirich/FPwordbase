@@ -12,7 +12,7 @@ OnlineModeScreen = ({navigation, route}) => {
       <SafeAreaView>
         <Text>Please Sign up or Login</Text>
 
-        <TouchableOpacity onPress = {() => checkTokenExpiration(navigation, "OnlineModeScreen")}>
+        <TouchableOpacity onPress = {() => checkTokenExpiration("OnlineModeScreen")}>
           <Text style = {[styles.buttonText]}>Login</Text>
         </TouchableOpacity>
 

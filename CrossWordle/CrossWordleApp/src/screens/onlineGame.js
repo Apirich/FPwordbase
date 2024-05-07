@@ -106,7 +106,7 @@ const randomPick = (itemList, loopTime, libName) => {
 
     // Update score to the database when disScore is changed
     useEffect(() => {
-      checkTokenExpiration("", "OnlineGameScreen")
+      checkTokenExpiration("OnlineGameScreen")
       .then((isTokenExpired) => {
         if(isTokenExpired){
           alert("Your login session has expired, latest score has not been updated! Please login again!");
@@ -133,7 +133,7 @@ const randomPick = (itemList, loopTime, libName) => {
 
     // Update coin to the database when disCoin is changed
     useEffect(() => {
-      checkTokenExpiration("", "OnlineGameScreen")
+      checkTokenExpiration("OnlineGameScreen")
       .then((isTokenExpired) => {
         if(isTokenExpired){
           alert("Your login session has expired, latest coin has not been updated! Please login again!");

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import NavigationService from "../navigations/navService";
 
 
 export const handleSignUp = ({username, email, password, navigation}) => {
@@ -91,18 +92,20 @@ export const handleLogin = ({email, password, navigation}) => {
 };
 
 
-export const checkTokenExpiration = (navigation, currentRouteName) => {
+export const checkTokenExpiration = (currentRouteName) => {
     return AsyncStorage.getItem("tokenExpTimestamp")
     .then((tokenExpTimestamp) => {
         if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000)){
             if(currentRouteName === "OnlineModeScreen"){
-                navigation.navigate("OnlineGame");
+                // navigation.navigate("OnlineGame");
+                NavigationService.navigate("OnlineGame");
             }else if(currentRouteName === "OnlineGameScreen"){
                 return false;
             }
         }else{
-            if(currentRouteName === "OnlineModeScreen"){
-                navigation.navigate("Login");
+            if(currentRouteName === "OnlineModeScreen" || (currentRouteName === "active" && tokenExpTimestamp)){
+                // navigation.navigate("Login");
+                NavigationService.navigate("Login");
             }else if(currentRouteName === "OnlineGameScreen"){
                 return true;
             }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 // Import navigation
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator} from "@react-navigation/stack";
+
 // Import NetInfo (NetInfo has event listenter)
 import NetInfo from '@react-native-community/netinfo';
 
@@ -12,7 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppState } from "react-native";
 
 //
-import { handleLogout } from "./src/database/fetchBackend";
+import { checkTokenExpiration } from "./src/database/fetchBackend";
+import NavigationService from "./src/navigations/navService"
 
 // Import screens
 import SplashScreen from "./src/screens/splash";
@@ -30,6 +32,8 @@ const Stack = createStackNavigator();
 export default function App(){
   const [loading, setLoading] = useState(true);
   const [internetChecking, setInternetChecking] = useState(true);
+
+  const [appState, setAppState] = useState("initial");
 
   const processLoading = async () => {
     // Splashing for 3 seconds
@@ -51,25 +55,11 @@ export default function App(){
   });
 
 
-  const handleAppClose = (appState) => {
-    if(appState === "background" || appState === "inactive"){
-      AsyncStorage.multiGet(["token", "tokenExpTimestamp"])
-      .then((items) => {
-        const filteredItems = items.filter(([_, value]) => value !== null);
-
-        if(filteredItems.length > 0){
-          // If token and tokenExpirationTimestamp exist, call handleLogout
-          handleLogout("nav");
-        }else{
-          // If token and tokenExpirationTimestamp do not exist, close the app
-          console.log("App.js - handleAppClose(): No token and tokenExpTimestamp found, closing the app...");
-        }
-      })
-      .catch((error) => {
-          console.error("App.js - handleAppClose(): Error retrieving items from AsyncStorage:", error);
-      });
-    }else if(appState === "active"){
-      console.log("reloaded");
+  const appStateChange = (state) => {
+    if(state === "active"){
+      setAppState("active");
+    }else if(state === "inactive"){ // Have to setAppState inactive so that the app able to detect multiple inactive/active
+      setAppState("inactive");
     }
   };
 
@@ -77,13 +67,21 @@ export default function App(){
   useEffect(() => {
     processLoading();
 
-    AppState.addEventListener("change", handleAppClose);
-
+    AppState.addEventListener("change", appStateChange);
+    
+    // Clean up event listener
     return () => {
-      // Clean up event listener
-      AppState.removeEventListener("change", handleAppClose);
+      AppState.removeEventListener("change", appStateChange);
     };
+
+
   }, []);
+
+  useEffect(() => {
+    if(appState === "active"){
+      checkTokenExpiration("appState");
+    }
+  }, [appState]);
 
 
   if(loading){
@@ -91,7 +89,7 @@ export default function App(){
   }
 
   return(
-    <NavigationContainer>
+    <NavigationContainer ref = {NavigationService.setTopLevelNavigator}>
       <Stack.Navigator initialRouteName = "Welcome">
         <Stack.Screen name = "Welcome" component = {WelcomeScreen}
                       options = {{headerShown: false}}

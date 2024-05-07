@@ -68,10 +68,19 @@ export const handleLogin = ({email, password, navigation}) => {
             throw new Error(response.status);
         }
     }).then((data) => {
+        // Check if the message indicates the user is currently logging in on a device
+        if(data.message === "PLogin: You are currently logging in on a device"){
+            alert("You are currently logged in on another device!");
+            return;
+        }
+
         console.log("fetchBackend.js - handleLogin(): token:", data.token);
-        return AsyncStorage.setItem("token", data.token).then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()));
-    }).then(() => {
-        navigation.navigate("OnlineGame");
+        // If not currently logging in on another device, proceed with storing token
+        return AsyncStorage.setItem("token", data.token)
+        .then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()))
+        .then(() => {
+            navigation.navigate("OnlineGame");
+        });
     }).catch((error) => {
         console.error("fetchBackend.js - handleLogin(): Error logging in:", error)
 
@@ -105,14 +114,49 @@ export const checkTokenExpiration = (navigation, currentRouteName) => {
 };
 
 
-export const handleLogout = ({navigation}) => {
-    AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
-    .then(() => {
-        navigation.navigate("OnlineMode");
-    })
-    .catch(error => {
-        console.error("fetchBackend.js - handleLogout(): Error logging out:", error);
-    });
+export const handleLogout = (navigation) => {
+    return AsyncStorage.getItem("token")
+        .then((token) => {
+            if(!token){
+                throw new Error("fetchBackend.js - handleLogout(): Token not found");
+            }
+
+            return fetch("http://192.168.12.205:3000/logout", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then((response) => {
+                // Check if the response is successful
+                if(!response.ok){
+                    throw new Error("fetchBackend.js - handleLogout(): Failed to update coin");
+                }
+
+                if(response.status === 204){
+                    console.log("fetchBackend.js - handleLogout(): User deleted successfully from the backend");
+
+                    return AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
+                    .then(() => {
+                        console.log("fetchBackend.js - handleLogout(): Removed token, tokenExpTimestamp");
+
+                        if(navigation !== "nav"){
+                            navigation.navigate("OnlineMode");
+                        }
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error("fetchBackend.js - handleLogout(): Error fetching:", error);
+                throw error;
+            });
+        })
+        .catch((error) => {
+            console.error("fetchBackend.js - handleLogout(): Error retrieving token from AsyncStorage:", error);
+            throw error;
+        });
 };
 
 
@@ -210,3 +254,15 @@ export const updateCoin = (coin) => {
         return {success: true};
     });
 };
+
+
+// // Function to reset AsyncStorage
+// export const resetAsyncStorage = () => {
+//     return AsyncStorage.clear()
+//     .then(() => {
+//         console.log("AsyncStorage cleared successfully.");
+//     })
+//     .catch((error) => {
+//         console.error("Error clearing AsyncStorage:", error);
+//     });
+// };

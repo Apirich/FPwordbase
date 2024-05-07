@@ -185,21 +185,80 @@ app.post("/login", (req, res) => {
           return res.status(401).json({ error: "PLogin: Invalid password" });
         }
 
-        // Token expiration time
-        const expTime = "1h";
+        // Check if user is logging in
+        connection.query("SELECT * FROM logins WHERE user_id = ?", [results[0].id], (error, loginResults) => {
+          if(error) {
+            // Release the connection back to the pool
+            connection.release();
 
-        // Calculate the expiration timestamp
-        // Convert current time from milSecond to second, and expTime to seconds
-        const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600
+            console.error("PLogin: Error checking logging in:", error);
+            return res.status(500).json({ error: "PLogin checking loggingin: Internal Server Error" });
+          }
 
-        // Generate JWT token
-        const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: expTime });
+          // User is logging in
+          if(loginResults.length > 0){
+            // Release the connection back to the pool
+            connection.release();
 
-        res.json({ message: "PLogin: Login successful with token", token, expTimestamp });
+            return res.json({ message: "PLogin: You are currently logging in on a device" });
+          }else{
+            // Insert entry into logins table
+            connection.query("INSERT INTO logins (user_id, status) VALUES (?, ?)", [results[0].id, true], (error, loginInsertResults) => {
+              // Release the connection back to the pool
+              connection.release();
+
+              if(error) {
+                console.error("PLogin: Error inserting login entry:", error);
+                return res.status(500).json({ error: "PLogin inserting login entry: Internal Server Error" });
+              }
+
+              // Token expiration time
+              const expTime = "1h";
+
+              // Calculate the expiration timestamp
+              // Convert current time from milSecond to second, and expTime to seconds
+              const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600
+
+              // Generate JWT token
+              const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: expTime });
+
+              res.json({ message: "PLogin: Login successful with token", token, expTimestamp });
+            });
+          }
+        });
       });
     });
   });
 });
+
+
+// -------- Delete login (logout) --------
+app.delete("/logout", verifyToken, (req, res) => {
+  const userId = req.userId;
+
+  console.log("Receive logout request");
+
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      console.error("DLogout POOL CONNECTION: Error acquiring connection:", error);
+      return res.status(500).json({ error: "DLogout POOL CONNECTION: Internal Server Error" });
+    }
+
+    // Delete login from the database
+    connection.query("DELETE FROM logins WHERE user_id = ?", [userId], (error, results) => {
+      // Release the connection back to the pool
+      connection.release();
+
+      if(error){
+        return res.status(500).json({ error: "DLogout: Error deleting login" });
+      }
+
+      res.status(204).send();
+    });
+  });
+});
+
 
 
 // -------- Get score --------

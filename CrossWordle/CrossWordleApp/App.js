@@ -11,6 +11,9 @@ import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppState } from "react-native";
 
+//
+import { handleLogout } from "./src/database/fetchBackend";
+
 // Import screens
 import SplashScreen from "./src/screens/splash";
 import WelcomeScreen from "./src/screens/welcome";
@@ -47,19 +50,29 @@ export default function App(){
     }
   });
 
-  // Using AsyncStorage and AppState
-  // To remove token and tokenTimestamp when the App is closed
+
   const handleAppClose = (appState) => {
     if(appState === "background" || appState === "inactive"){
-      AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
-      .then(() => {
-        console.log("App.js - handleAppClose(): Removed token, tokenExpTimestamp");
+      AsyncStorage.multiGet(["token", "tokenExpTimestamp"])
+      .then((items) => {
+        const filteredItems = items.filter(([_, value]) => value !== null);
+
+        if(filteredItems.length > 0){
+          // If token and tokenExpirationTimestamp exist, call handleLogout
+          handleLogout("nav");
+        }else{
+          // If token and tokenExpirationTimestamp do not exist, close the app
+          console.log("App.js - handleAppClose(): No token and tokenExpTimestamp found, closing the app...");
+        }
       })
       .catch((error) => {
-        console.error("App.js - handleAppClose(): Error removing item from AsyncStorage:", error);
+          console.error("App.js - handleAppClose(): Error retrieving items from AsyncStorage:", error);
       });
+    }else if(appState === "active"){
+      console.log("reloaded");
     }
   };
+
 
   useEffect(() => {
     processLoading();

@@ -171,7 +171,7 @@ const randomPick = (itemList, loopTime, libName) => {
             <Text style = {[styles.buttonText]}>Home</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress = {() => handleLogout({navigation})}>
+          <TouchableOpacity onPress = {() => handleLogout(navigation)}>
             <Text style = {[styles.buttonText]}>Logout</Text>
           </TouchableOpacity>
 

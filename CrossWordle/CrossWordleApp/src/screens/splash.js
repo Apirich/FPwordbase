@@ -1,4 +1,6 @@
-import { StyleSheet, View, Text, SafeAreaView, Image, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, Dimensions, SafeAreaView, Image, ActivityIndicator } from "react-native";
+
+const screenDimensions = Dimensions.get("screen");
 
 // -------- Splash Screen --------
 SplashScreen = (internetStatus) => {
@@ -6,8 +8,8 @@ SplashScreen = (internetStatus) => {
       <View style = {styles.container}>
         <SafeAreaView>
           <Image
-              style = {styles.logo}
-              source = {require("../../assets/crosswordleLogo.png")}
+            style = {styles.logo}
+            source = {require("../../assets/crosswordleLogo.png")}
           />
 
           <ActivityIndicator size = {"large"}/>
@@ -22,17 +24,16 @@ SplashScreen = (internetStatus) => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff",
+      backgroundColor: "#f6efde",
       alignItems: "center",
       justifyContent: "center",
     },
 
     // Splash Screen
     logo: {
-      width: 120,
-      height: 120,
+      width: screenDimensions.height * 1 / 3,
+      height: screenDimensions.height * 1 / 3,
       alignSelf: "center",
-      marginBottom: 20,
     },
 });
 

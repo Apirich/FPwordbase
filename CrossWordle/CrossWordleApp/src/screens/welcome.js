@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Dimensions, SafeAreaView, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Dimensions, SafeAreaView, Image, TouchableOpacity } from "react-native";
 
 const screenDimensions = Dimensions.get("screen");
 
@@ -9,14 +9,13 @@ WelcomeScreen = ({navigation, route}) => {
     return(
       <View style = {styles.container}>
         <SafeAreaView>
-          <Text>Welcom to The Crosswordle App</Text>
-          <Text>Please Choose Gaming Mode</Text>
+          <Text style = {styles.appNameText}>Crosswordle</Text>
 
-          <TouchableOpacity onPress = {() => navigation.navigate("OnlineMode")} disabled = {internetChecking ? false : true}>
-            <Text style = {[styles.buttonText, internetChecking ? null : styles.disableButtonText]}>Online Mode</Text>
+          <TouchableOpacity style = {[styles.button, internetChecking ? null : styles.disableButton]} onPress = {() => navigation.navigate("OnlineMode")} disabled = {internetChecking ? false : true}>
+            <Text style = {styles.buttonText}>Online Mode</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress = {() => navigation.navigate("OfflineGame")}>
+          <TouchableOpacity style = {[styles.button, {marginTop: screenDimensions.height/20}]} onPress = {() => navigation.navigate("OfflineGame")}>
             <Text style = {[styles.buttonText]}>Offline Mode</Text>
           </TouchableOpacity>
       </SafeAreaView>
@@ -28,21 +27,52 @@ WelcomeScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff",
+      backgroundColor: "#f6efde",
       alignItems: "center",
-      justifyContent: "center",
+      justifyContent: "flex-start",
     },
 
     // Welcome Screen
-    buttonText: {
-      color: "green",
-      fontSize: screenDimensions.width/20,
+    appNameText: {
+      fontSize: screenDimensions.width/8,
+      fontWeight: "bold",
+      color: "#d83f03",
+      alignSelf: "center",
+      marginTop: screenDimensions.height/4,
     },
 
-    disableButtonText: {
-      color: "grey",
-      fontSize: screenDimensions.width/20,
+    button: {
+      width: screenDimensions.width/2,
+      height: screenDimensions.height/12,
+      backgroundColor: "#331005",
+      alignSelf: "center",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: screenDimensions.width/20,
+      marginTop: screenDimensions.height/6,
+    },
+
+    disableButton: {
+      width: screenDimensions.width/2,
+      height: screenDimensions.height/12,
+      backgroundColor: "#eae5d1",
+      alignSelf: "center",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: screenDimensions.width/20,
+      marginTop: screenDimensions.height/6,
+    },
+
+    buttonText: {
+      color: "#f6efde",
+      fontWeight: "500",
+      fontSize: screenDimensions.width/16,
+      alignSelf: "center",
     },
 });
+
+// #331005
+
+// #d6cfb9
 
 export default WelcomeScreen;

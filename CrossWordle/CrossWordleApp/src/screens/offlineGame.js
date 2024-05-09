@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
+import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
 import { generate, count } from "random-words";
 import { getScore, updateScore, getCoin, updateCoin } from "../database/dbQueries";
@@ -139,14 +140,35 @@ const randomPick = (itemList, loopTime, libName) => {
     return(
       <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
         <SafeAreaView style = {styles.safeArea}>
-          <TouchableOpacity onPress = {() => navigation.navigate("Welcome")}>
-            <Text style = {[styles.buttonText]}>Home</Text>
+          <TouchableOpacity style = {styles.button}
+                            onPress = {() => navigation.navigate("Welcome")}
+          >
+            <MaterialCommunityIcons name = "home"
+                                    size = {screenDimensions.width/12}
+                                    color = "#f6efde"
+            />
           </TouchableOpacity>
 
           <View style = {styles.scoreLvlContainer}>
-            <Text>Level: {disLevel}</Text>
-            <Text>Score: {disScore}</Text>
-            <Text>Coin: {disCoin}</Text>
+            <MaterialCommunityIcons name = "trophy-outline"
+                                    size = {screenDimensions.width/12}
+                                    color = "#331005"
+            />
+            <Text style = {styles.scoreLvlText}>{disLevel}</Text>
+            <View style = {styles.gap}/>
+
+            <MaterialIcons name = "grade"
+                           size = {screenDimensions.width/12}
+                           color = "#331005"
+            />
+            <Text style = {styles.scoreLvlText}>{disScore}</Text>
+            <View style = {styles.gap}/>
+
+            <FontAwesome6 name = "gem"
+                          size = {screenDimensions.width/14}
+                          color = "#331005"
+            />
+            <Text style = {styles.scoreLvlText}>{disCoin}</Text>
           </View>
 
           <View style = {styles.displayGameContainer}>
@@ -165,36 +187,52 @@ const randomPick = (itemList, loopTime, libName) => {
 
 // -------- Styles --------
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#f6efde",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-    // Game Screen
-    safeArea: {
-      flex: 1,
-    },
+  // Game Screen
+  safeArea: {
+    flex: 1,
+  },
 
-    buttonText: {
-      color: "green",
-      fontSize: screenDimensions.width/20,
-    },
+  button: {
+    width: screenDimensions.width/8,
+    height: screenDimensions.width/8,
+    backgroundColor: "#d83f03",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: screenDimensions.width/16,
+  },
 
-    scoreLvlContainer: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      paddingTop: 20,
-      backgroundColor: "white",
-      zIndex: 1,
-    },
+  scoreLvlContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingTop: screenDimensions.width/24,
+    backgroundColor: "#f6efde",
+    zIndex: 1,
+  },
 
-    displayGameContainer: {
-      flex: 1,
-      marginTop: 10,
-      zIndex: 0,
-    },
+  scoreLvlText: {
+    color: "#331005",
+    fontWeight: "500",
+    fontSize: screenDimensions.width/16,
+    marginLeft: -screenDimensions.width/20,
+  },
+
+  gap: {
+    width: screenDimensions.width/16,
+  },
+
+  displayGameContainer: {
+    flex: 1,
+    marginTop: screenDimensions.width/48,
+    zIndex: 0,
+  },
 });
 
 export default OfflineGameScreen;

@@ -251,13 +251,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                 <View key = {i} style = {styles.row}>
                     {row.map((cell, j) => (
                         <View key = {j} style = {styles.wordCell}>
-                            {crosswordData.map(({xPos, yPos, direction}, ind) => {
-                                return i === yPos && j === xPos ?
-                                <Text key = {ind + direction} style = {styles.title}>{ind + 1 + direction}</Text>
-                                :
-                                null;
-                            })}
-
                             <TextInput style = {[styles.cell,
                                                 cell === "-1" ? styles.emptyCell : null]}
                                         value = {cell}
@@ -265,6 +258,13 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                                         maxLength = {1}
                                         onChangeText = {(input) => handleGridInput(i, j, input.toUpperCase())}
                             />
+
+                            {crosswordData.map(({xPos, yPos, direction}, ind) => {
+                                return i === yPos && j === xPos ?
+                                <Text key = {ind + direction} style = {styles.title}>{ind + 1 + direction}</Text>
+                                :
+                                null;
+                            })}
                         </View>
                     ))}
                 </View>
@@ -275,7 +275,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
     const displayMatch = () => (
         <View style = {{flexDirection: "row"}}>
             {Array.from(disMatch).map((letter, i) => (
-                <Text key = {i} style = {[styles.match]}>
+                <Text key = {i} style = {[styles.matchText]}>
                     {letter}
                 </Text>
             ))}
@@ -307,32 +307,43 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                     <DisplayMaster/> */}
 
                     <View>
-                        <Text>{disStatus}</Text>
+                        <Text style = {[styles.statusText]}>{disStatus}</Text>
                     </View>
 
                     <View>
-                        <Text>{revealedGame}</Text>
+                        <Text style = {[styles.revealText]}>{revealedGame}</Text>
                     </View>
 
                     <View style = {styles.buttonCon}>
-                        <TouchableOpacity style = {styles.button} onPress = {() => handleVerify(crosswordData)} disabled = {disStatus === "Nailed it!" ? true : false}>
-                            <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Verify</Text>
+                        <TouchableOpacity style = {[styles.button, disStatus === "Nailed it!" ? styles.disableButton: null]}
+                                          onPress = {() => handleVerify(crosswordData)}
+                                          disabled = {disStatus === "Nailed it!" ? true : false}
+                        >
+                            <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButton : null]}>Verify</Text>
                         </TouchableOpacity>
                         <View style = {styles.gap}/>
 
-                        <TouchableOpacity style = {styles.button} onPress = {() => handleReset()} disabled = {disStatus === "Nailed it!" ? true : false}>
-                            <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButtonText : null]}>Reset</Text>
+                        <TouchableOpacity style = {[styles.button, disStatus === "Nailed it!" ? styles.disableButton: null]}
+                                          onPress = {() => handleReset()}
+                                          disabled = {disStatus === "Nailed it!" ? true : false}
+                        >
+                            <Text style = {[styles.buttonText, disStatus === "Nailed it!" ? styles.disableButton: null]}>Reset</Text>
                         </TouchableOpacity>
                         <View style = {styles.gap}/>
 
-                        <TouchableOpacity style = {styles.button} onPress = {() => handleGenerate()}>
+                        <TouchableOpacity style = {styles.button}
+                                          onPress = {() => handleGenerate()}
+                        >
                             <Text style = {styles.buttonText}>New Game</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity style = {styles.button} onPress = {() => handleReveal()} disabled = {disRevealStatus === true ? true : false}>
-                            <Text style = {[styles.buttonText, disRevealStatus === true ? styles.disableButtonText : null]}>Reveal</Text>
-                        </TouchableOpacity>
                         <View style = {styles.gap}/>
+
+                        <TouchableOpacity style = {[styles.button, disRevealStatus === true ? styles.disableButton : null]}
+                                          onPress = {() => handleReveal()}
+                                          disabled = {disRevealStatus === true ? true : false}
+                        >
+                            <Text style = {[styles.buttonText, disRevealStatus === true ? styles.disableButton : null]}>Reveal</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
@@ -342,7 +353,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
+        flex: 1,
     },
 
     scrollContainer: {
@@ -351,71 +362,89 @@ const styles = StyleSheet.create({
 
     content: {
         flex: 1,
-        // backgroundColor: "red",
         justifyContent: "center",
         alignItems: "center",
     },
 
     row: {
-      flexDirection: "row",
+        flexDirection: "row",
     },
 
-    // wordCell: {
-    //   position: "relative",
-    // },
-
     cell: {
-      borderWidth: 1,
-      borderColor: "green",
-      width: screenDimensions.width/12,
-      aspectRatio: 1,
-      textAlign: "center",
+        borderWidth: screenDimensions.width/300,
+        borderColor: "#331005",
+        backgroundColor: "#f1c7af",
+        color: "#331005",
+        width: screenDimensions.width/12,
+        aspectRatio: 1,
+        textAlign: "center",
     },
 
     emptyCell: {
-      borderColor: "transparent",
-      color: "transparent",
+        borderColor: "transparent",
+        color: "transparent",
+        backgroundColor: "transparent",
     },
 
     title: {
-      position: "absolute",
-      top: 2,
-      left: 2,
-      fontSize: 6,
-      fontWeight: "bold",
+        position: "absolute",
+        top: screenDimensions.width/180,
+        left: screenDimensions.width/180,
+        fontSize: screenDimensions.width/60,
+        fontWeight: "bold",
+        color: "#d83f03",
     },
 
-    match: {
-        color: "red",
+    matchText: {
+        color: "#1C9B3A",
         fontSize: screenDimensions.width/14,
         padding: screenDimensions.width/42,
+        fontWeight: "bold",
+    },
+
+    statusText: {
+        color: "#331005",
+        fontSize: screenDimensions.width/28,
+        padding: screenDimensions.width/42,
+        fontWeight: "bold",
+    },
+
+    revealText: {
+        color: "#A38960",
+        fontSize: screenDimensions.width/16,
         fontWeight: "bold",
     },
 
     buttonCon: {
 		flexDirection: "row",
 		justifyContent: "space-around",
-		marginTop: 20,
-		marginHorizontal: 10,
+		marginTop: screenDimensions.height/26,
+		marginHorizontal: screenDimensions.height/36,
 	},
 
 	button: {
-		flex: 1, // Ensure equal width for both buttons
+        height: screenDimensions.height/18,
+        backgroundColor: "#d83f03",
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: screenDimensions.width/30,
+        padding: screenDimensions.width/50,
 	},
 
     buttonText: {
-        color: "green",
+        color: "#f6efde",
+        fontWeight: "500",
         fontSize: screenDimensions.width/20,
     },
 
-    disableButtonText: {
-        color: "grey",
-        fontSize: screenDimensions.width/20,
+    disableButton: {
+        opacity: 0.3,
     },
 
-	gap: {
-		width: 10, // Adjust the width as needed for the desired gap
-	},
+    gap: {
+        width: screenDimensions.width/16,
+    },
 });
 
 export default DisplayGame;

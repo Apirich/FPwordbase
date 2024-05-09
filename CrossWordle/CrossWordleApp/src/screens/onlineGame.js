@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
+import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
 import { generate, count } from "random-words";
 
@@ -167,18 +168,51 @@ const randomPick = (itemList, loopTime, libName) => {
     return(
       <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
         <SafeAreaView style = {styles.safeArea}>
-          <TouchableOpacity onPress = {() => navigation.navigate("OnlineMode")}>
-            <Text style = {[styles.buttonText]}>Home</Text>
-          </TouchableOpacity>
+          <View style = {styles.buttonCon}>
+            <TouchableOpacity style = {styles.button}
+                              onPress = {() => navigation.navigate("OnlineMode")}
+            >
+              <MaterialCommunityIcons name = "home"
+                                      size = {screenDimensions.width/12}
+                                      color = "#f6efde"
+              />
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress = {() => handleLogout(navigation)}>
+            <TouchableOpacity style = {styles.button}
+                              onPress = {() => handleLogout(navigation)}
+            >
+              <MaterialCommunityIcons style = {styles.symbol}
+                                    name = "logout"
+                                    size = {screenDimensions.width/12}
+                                    color = "#f6efde"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* <TouchableOpacity onPress = {() => handleLogout(navigation)}>
             <Text style = {[styles.buttonText]}>Logout</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style = {styles.scoreLvlContainer}>
-            <Text>Level: {disLevel}</Text>
-            <Text>Score: {disScore}</Text>
-            <Text>Coin: {disCoin}</Text>
+            <MaterialCommunityIcons name = "trophy-outline"
+                                    size = {screenDimensions.width/12}
+                                    color = "#331005"
+            />
+            <Text style = {styles.scoreLvlText}>{disLevel}</Text>
+            <View style = {styles.gap}/>
+
+            <MaterialIcons name = "grade"
+                           size = {screenDimensions.width/12}
+                           color = "#331005"
+            />
+            <Text style = {styles.scoreLvlText}>{disScore}</Text>
+            <View style = {styles.gap}/>
+
+            <FontAwesome6 name = "gem"
+                          size = {screenDimensions.width/14}
+                          color = "#331005"
+            />
+            <Text style = {styles.scoreLvlText}>{disCoin}</Text>
           </View>
 
           <View style = {styles.displayGameContainer}>
@@ -199,7 +233,7 @@ const randomPick = (itemList, loopTime, libName) => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#fff",
+      backgroundColor: "#f6efde",
       alignItems: "center",
       justifyContent: "center",
     },
@@ -209,22 +243,45 @@ const styles = StyleSheet.create({
       flex: 1,
     },
 
-    buttonText: {
-      color: "green",
-      fontSize: screenDimensions.width/20,
+    buttonCon: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      marginTop: screenDimensions.height/26,
+      marginHorizontal: screenDimensions.height/36,
+    },
+
+    button: {
+      width: screenDimensions.width/8,
+      height: screenDimensions.width/8,
+      backgroundColor: "#d83f03",
+      alignSelf: "center",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: screenDimensions.width/16,
     },
 
     scoreLvlContainer: {
       flexDirection: "row",
       justifyContent: "space-around",
-      paddingTop: 20,
-      backgroundColor: "white",
+      paddingTop: screenDimensions.width/24,
+      backgroundColor: "#f6efde",
       zIndex: 1,
+    },
+
+    scoreLvlText: {
+      color: "#331005",
+      fontWeight: "500",
+      fontSize: screenDimensions.width/16,
+      marginLeft: -screenDimensions.width/20,
+    },
+
+    gap: {
+      width: screenDimensions.width/16,
     },
 
     displayGameContainer: {
       flex: 1,
-      marginTop: 10,
+      marginTop: screenDimensions.width/48,
       zIndex: 0,
     },
 });

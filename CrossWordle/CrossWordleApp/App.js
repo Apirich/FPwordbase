@@ -68,7 +68,7 @@ export default function App(){
     processLoading();
 
     AppState.addEventListener("change", appStateChange);
-    
+
     // Clean up event listener
     return () => {
       AppState.removeEventListener("change", appStateChange);

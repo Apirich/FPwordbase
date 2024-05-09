@@ -22,19 +22,19 @@ SplashScreen = (internetStatus) => {
 
 // -------- Styles --------
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#f6efde",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#f6efde",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-    // Splash Screen
-    logo: {
-      width: screenDimensions.height * 1 / 3,
-      height: screenDimensions.height * 1 / 3,
-      alignSelf: "center",
-    },
+  // Splash Screen
+  logo: {
+    width: screenDimensions.height * 1 / 3,
+    height: screenDimensions.height * 1 / 3,
+    alignSelf: "center",
+  },
 });
 
 export default SplashScreen;

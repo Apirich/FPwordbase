@@ -11,11 +11,16 @@ WelcomeScreen = ({navigation, route}) => {
         <SafeAreaView>
           <Text style = {styles.appNameText}>Crosswordle</Text>
 
-          <TouchableOpacity style = {[styles.button, internetChecking ? null : styles.disableButton]} onPress = {() => navigation.navigate("OnlineMode")} disabled = {internetChecking ? false : true}>
-            <Text style = {styles.buttonText}>Online Mode</Text>
+          <TouchableOpacity style = {[styles.button, internetChecking ? null : styles.disableButton]}
+                            onPress = {() => navigation.navigate("OnlineMode")}
+                            disabled = {internetChecking ? false : true}
+          >
+            <Text style = {[styles.buttonText, internetChecking ? null : styles.disableButton]}>Online Mode</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style = {[styles.button, {marginTop: screenDimensions.height/20}]} onPress = {() => navigation.navigate("OfflineGame")}>
+          <TouchableOpacity style = {[styles.button, {marginTop: screenDimensions.height/20}]}
+                            onPress = {() => navigation.navigate("OfflineGame")}
+          >
             <Text style = {[styles.buttonText]}>Offline Mode</Text>
           </TouchableOpacity>
       </SafeAreaView>
@@ -25,50 +30,43 @@ WelcomeScreen = ({navigation, route}) => {
 
 // -------- Styles --------
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#f6efde",
-      alignItems: "center",
-      justifyContent: "flex-start",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#f6efde",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
 
-    // Welcome Screen
-    appNameText: {
-      fontSize: screenDimensions.width/8,
-      fontWeight: "bold",
-      color: "#d83f03",
-      alignSelf: "center",
-      marginTop: screenDimensions.height/4,
-    },
+  // Welcome Screen
+  appNameText: {
+    fontSize: screenDimensions.width/8,
+    fontWeight: "bold",
+    color: "#d83f03",
+    alignSelf: "center",
+    marginTop: screenDimensions.height/4,
+  },
 
-    button: {
-      width: screenDimensions.width/2,
-      height: screenDimensions.height/12,
-      backgroundColor: "#331005",
-      alignSelf: "center",
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: screenDimensions.width/20,
-      marginTop: screenDimensions.height/6,
-    },
+  button: {
+    width: screenDimensions.width/2,
+    height: screenDimensions.height/12,
+    backgroundColor: "#331005",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: screenDimensions.width/20,
+    marginTop: screenDimensions.height/6,
+  },
 
-    disableButton: {
-      width: screenDimensions.width/2,
-      height: screenDimensions.height/12,
-      backgroundColor: "#eae5d1",
-      alignSelf: "center",
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: screenDimensions.width/20,
-      marginTop: screenDimensions.height/6,
-    },
+  buttonText: {
+    color: "#f6efde",
+    fontWeight: "500",
+    fontSize: screenDimensions.width/16,
+    alignSelf: "center",
+  },
 
-    buttonText: {
-      color: "#f6efde",
-      fontWeight: "500",
-      fontSize: screenDimensions.width/16,
-      alignSelf: "center",
-    },
+  disableButton: {
+    opacity: 0.3,
+  },
 });
 
 // #331005

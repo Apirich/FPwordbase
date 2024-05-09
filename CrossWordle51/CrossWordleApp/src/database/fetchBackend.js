@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationService from "../navigations/navService";
 
 
-export const handleSignUp = ({username, email, password, navigation}) => {
+export const handleSignUp = ({username, email, password}) => {
     // Check if any of the input fields are empty
     if (!username || !email || !password) {
         alert("Your inputs are empty!");
@@ -27,8 +27,9 @@ export const handleSignUp = ({username, email, password, navigation}) => {
 
         // If successfully signeup or there is backend internal error signing up
         if(response.status == 201){
-            alert("You have successfully created your account!");
-            navigation.navigate("OnlineMode");
+            alert("You have successfully created your CrossWordle account!");
+            // navigation.navigate("OnlineMode");
+            NavigationService.navigate("OnlineMode");
         }else{
             throw new Error(response.status);
         }
@@ -36,13 +37,13 @@ export const handleSignUp = ({username, email, password, navigation}) => {
         // console.error("fetchBackend.js - handleSignup(): Error signing up:", error);
 
         if(error.message == "400"){
-            alert("This account already exists!");
+            alert("This username or email are already registered with CrossWordle!");
         }
     });
 };
 
 
-export const handleLogin = ({email, password, navigation}) => {
+export const handleLogin = ({email, password}) => {
     // Check if any of the input fields are empty
     if (!email || !password) {
         alert("Your inputs are empty!");
@@ -71,7 +72,7 @@ export const handleLogin = ({email, password, navigation}) => {
     }).then((data) => {
         // Check if the message indicates the user is currently logging in on a device
         if(data.message === "PLogin: You are currently logging in on a device"){
-            alert("You are currently logged in on another device!");
+            alert("Your CrossWordle account is currently logged in on another device!");
             return;
         }
 
@@ -80,7 +81,8 @@ export const handleLogin = ({email, password, navigation}) => {
         return AsyncStorage.setItem("token", data.token)
         .then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()))
         .then(() => {
-            navigation.navigate("OnlineGame");
+            // navigation.navigate("OnlineGame");
+            NavigationService.navigate("OnlineGame");
         });
     }).catch((error) => {
         // console.error("fetchBackend.js - handleLogin(): Error logging in:", error)
@@ -117,7 +119,7 @@ export const checkTokenExpiration = (currentRouteName) => {
 };
 
 
-export const handleLogout = (navigation) => {
+export const handleLogout = () => {
     return AsyncStorage.getItem("token")
         .then((token) => {
             if(!token){
@@ -145,9 +147,8 @@ export const handleLogout = (navigation) => {
                     .then(() => {
                         console.log("fetchBackend.js - handleLogout(): Removed token, tokenExpTimestamp");
 
-                        if(navigation !== "nav"){
-                            navigation.navigate("OnlineMode");
-                        }
+                        // navigation.navigate("OnlineMode");
+                        NavigationService.navigate("OnlineMode");
                     });
                 }
             })

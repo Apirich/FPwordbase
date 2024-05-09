@@ -179,7 +179,7 @@ const randomPick = (itemList, loopTime, libName) => {
             </TouchableOpacity>
 
             <TouchableOpacity style = {styles.button}
-                              onPress = {() => handleLogout(navigation)}
+                              onPress = {() => handleLogout()}
             >
               <MaterialCommunityIcons style = {styles.symbol}
                                     name = "logout"
@@ -188,10 +188,6 @@ const randomPick = (itemList, loopTime, libName) => {
               />
             </TouchableOpacity>
           </View>
-
-          {/* <TouchableOpacity onPress = {() => handleLogout(navigation)}>
-            <Text style = {[styles.buttonText]}>Logout</Text>
-          </TouchableOpacity> */}
 
           <View style = {styles.scoreLvlContainer}>
             <MaterialCommunityIcons name = "trophy-outline"

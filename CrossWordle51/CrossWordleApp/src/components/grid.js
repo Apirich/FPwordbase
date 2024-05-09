@@ -59,6 +59,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
     const [solvedGame, setSolvedGame] = useState([gamePerLevel]);
     const [revealedGame, setRevealedGame] = useState("");
     const [disRevealStatus, setDisRevealStatus] = useState(false);
+    const [disCheerLvUp, setDisCheerLvUp] = useState(false);
 
     console.log(master[(level - 1) % maxLevel][numGame]);
 
@@ -73,6 +74,11 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
     }, [crosswordsProc, master, numGame, level, maxLevel, gamePerLevel]);
 
     useEffect(() => {
+        // Avoid level up alert everytime starting a screen with DisplayGame component
+        if(disCheerLvUp){
+            alert("Hooray, you have leveled up!");
+        }
+
         setDisStatus("Need to be solved!");
         setDisMatch([]);
     }, [level]);
@@ -100,6 +106,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
         if(verifyMaster === master[(level - 1) % maxLevel][numGame]){
             setDisStatus("Nailed it!");
+            setDisCheerLvUp(true);
             computeScore(score + 5);
             computeCoin(coin + 5);
 
@@ -419,7 +426,7 @@ const styles = StyleSheet.create({
     buttonCon: {
 		flexDirection: "row",
 		justifyContent: "space-around",
-		marginTop: screenDimensions.height/26,
+		marginTop: screenDimensions.height/40,
 		marginHorizontal: screenDimensions.height/36,
 	},
 

@@ -53,7 +53,7 @@ SignupScreen = ({navigation, route}) => {
           />
 
           <TouchableOpacity style = {styles.button}
-                            onPress = {() => handleSignUp({username, email, password, navigation})}>
+                            onPress = {() => handleSignUp({username, email, password})}>
             <Text style = {styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
       </SafeAreaView>

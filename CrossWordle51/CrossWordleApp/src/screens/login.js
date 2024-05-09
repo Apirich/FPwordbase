@@ -46,7 +46,7 @@ LoginScreen = ({navigation, route}) => {
           />
 
           <TouchableOpacity style = {styles.button}
-                            onPress = {() => handleLogin({email, password, navigation})}
+                            onPress = {() => handleLogin({email, password})}
           >
             <Text style = {styles.buttonText}>Login</Text>
           </TouchableOpacity>

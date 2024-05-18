@@ -12,176 +12,176 @@ const screenDimensions = Dimensions.get("screen");
 
 // -------- Generate words positions --------
 const randomPick = (itemList, loopTime, libName) => {
-    while(itemList.length < loopTime){
-      chosenItem = libName[Math.floor(Math.random() * libName.length)]
-      if(itemList.indexOf(chosenItem) === -1){
-        itemList.push(chosenItem);
-      }
+  while(itemList.length < loopTime){
+    chosenItem = libName[Math.floor(Math.random() * libName.length)]
+    if(itemList.indexOf(chosenItem) === -1){
+      itemList.push(chosenItem);
     }
+  }
 
-    return itemList;
-  };
+  return itemList;
+};
 
 
-  // -------- Generate grids data (game) --------
-  const generateLibrary = (gen, level, game, word) => {
-    const positions = [0, 1, 2, 3, 4];
-    let wXpos = [];
-    let wYpos = [];
+// -------- Generate grids data (game) --------
+const generateLibrary = (gen, level, game, word) => {
+  const positions = [0, 1, 2, 3, 4];
+  let wXpos = [];
+  let wYpos = [];
 
-    let arrLib = []
+  let arrLib = []
 
-    for(let i = 0; i < level; ++i){
-      arrLib.push([]);
+  for(let i = 0; i < level; ++i){
+    arrLib.push([]);
 
-      for(let j = 0; j < game; ++j){
-        if(word > 1){
-          wXpos = randomPick(wXpos, word, positions);
-          wYpos = randomPick(wYpos, word, positions);
+    for(let j = 0; j < game; ++j){
+      if(word > 1){
+        wXpos = randomPick(wXpos, word, positions);
+        wYpos = randomPick(wYpos, word, positions);
 
-          arrLib[i].push([]);
+        arrLib[i].push([]);
 
-          for(let k = 0; k < word; ++k){
-            arrLib[i][j].push({
-              "direction": Math.random() < 0.5 ? "A" : "D",
-              "word": gen[word * game * i + word * j + k],
-              "xPos": wXpos[k],
-              "yPos": wYpos[k],
-            });
-          }
-        }else{
-          arrLib[i].push(gen[game * i + j]);
+        for(let k = 0; k < word; ++k){
+          arrLib[i][j].push({
+            "direction": Math.random() < 0.5 ? "A" : "D",
+            "word": gen[word * game * i + word * j + k],
+            "xPos": wXpos[k],
+            "yPos": wYpos[k],
+          });
         }
+      }else{
+        arrLib[i].push(gen[game * i + j]);
       }
     }
+  }
 
-    return arrLib;
-  };
-
-
-  // -------- Offline Game Screen --------
-  OfflineGameScreen = ({navigation, route}) => {
-    const maxLevel = 10;
-    const gamePerLevel = 3;
-
-    const [master, setMaster] = useState(generateLibrary(
-      generate({
-        exactly: 30,
-        wordsPerString: 1,
-        minLength: 6,
-        maxLength: 8,
-        formatter: (word) => word.toUpperCase(),
-      }), maxLevel, gamePerLevel, 1)
-    );
-
-    const [crosswords, setCrosswords] = useState(generateLibrary(
-      generate({
-        exactly: 150,
-        wordsPerString: 1,
-        minLength: 3,
-        maxLength: 5,
-        formatter: (word) => word.toUpperCase(),
-      }), maxLevel, gamePerLevel, 5)
-    );
-
-    // const [crosswords, setCrosswords] = useState(wordsList);
-    // const [master, setMaster] = useState(masterList);
-
-    const [disScore, setDisScore] = useState(0);
-    const [disLevel, setDisLevel] = useState(1);
-    const [disCoin, setDisCoin] = useState(10);
+  return arrLib;
+};
 
 
-    // Retrieve score from the database, ONLY ONCE when the app start
-    useEffect(() => {
-      getScore()
-      .then((data) => {
-        setDisScore(data);
-      })
-      .catch((error) => {
-        console.error("Error getScore() from SQLite:", error);
-      });
+// -------- Offline Game Screen --------
+OfflineGameScreen = ({navigation, route}) => {
+  const maxLevel = 10;
+  const gamePerLevel = 3;
 
-      getCoin()
-      .then((data) => {
-        setDisCoin(data);
-      })
-      .catch((error) => {
-        console.error("Error getCoin() from SQLite:", error);
-      });
-    }, []);
+  const [master, setMaster] = useState(generateLibrary(
+    generate({
+      exactly: 30,
+      wordsPerString: 1,
+      minLength: 6,
+      maxLength: 8,
+      formatter: (word) => word.toUpperCase(),
+    }), maxLevel, gamePerLevel, 1)
+  );
 
-    // Update score to the database when disScore is changed
-    useEffect(() => {
-      setDisLevel(1 + Math.floor(disScore/10));
+  const [crosswords, setCrosswords] = useState(generateLibrary(
+    generate({
+      exactly: 150,
+      wordsPerString: 1,
+      minLength: 3,
+      maxLength: 5,
+      formatter: (word) => word.toUpperCase(),
+    }), maxLevel, gamePerLevel, 5)
+  );
 
-      updateScore(disScore)
-      .catch((error) => {
-        console.error('Error updating score:', error);
-      });
-    }, [disScore]);
+  // const [crosswords, setCrosswords] = useState(wordsList);
+  // const [master, setMaster] = useState(masterList);
 
-    // Update coin to the database when disCoin is changed
-    useEffect(() => {
-      updateCoin(disCoin)
-      .catch((error) => {
-        console.error('Error updating coin:', error);
-      });
-    }, [disCoin]);
+  const [disScore, setDisScore] = useState(0);
+  const [disLevel, setDisLevel] = useState(1);
+  const [disCoin, setDisCoin] = useState(10);
 
-    const computeScore = (score) => {
-      setDisScore(score);
-    }
 
-    const computeCoin = (coin) => {
-      setDisCoin(coin);
-    }
+  // Retrieve score from the database, ONLY ONCE when the app start
+  useEffect(() => {
+    getScore()
+    .then((data) => {
+      setDisScore(data);
+    })
+    .catch((error) => {
+      console.error("Error getScore() from SQLite:", error);
+    });
 
-    return(
-      <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
-        <SafeAreaView style = {styles.safeArea}>
-          <TouchableOpacity style = {styles.button}
-                            onPress = {() => navigation.navigate("Welcome")}
-          >
-            <MaterialCommunityIcons name = "home"
-                                    size = {screenDimensions.width/12}
-                                    color = "#f6efde"
-            />
-          </TouchableOpacity>
+    getCoin()
+    .then((data) => {
+      setDisCoin(data);
+    })
+    .catch((error) => {
+      console.error("Error getCoin() from SQLite:", error);
+    });
+  }, []);
 
-          <View style = {styles.scoreLvlContainer}>
-            <MaterialCommunityIcons name = "trophy-outline"
-                                    size = {screenDimensions.width/12}
-                                    color = "#331005"
-            />
-            <Text style = {styles.scoreLvlText}>{disLevel}</Text>
-            <View style = {styles.gap}/>
+  // Update score to the database when disScore is changed
+  useEffect(() => {
+    setDisLevel(1 + Math.floor(disScore/10));
 
-            <MaterialIcons name = "grade"
-                           size = {screenDimensions.width/12}
-                           color = "#331005"
-            />
-            <Text style = {styles.scoreLvlText}>{disScore}</Text>
-            <View style = {styles.gap}/>
+    updateScore(disScore)
+    .catch((error) => {
+      console.error('Error updating score:', error);
+    });
+  }, [disScore]);
 
-            <FontAwesome6 name = "gem"
-                          size = {screenDimensions.width/14}
+  // Update coin to the database when disCoin is changed
+  useEffect(() => {
+    updateCoin(disCoin)
+    .catch((error) => {
+      console.error('Error updating coin:', error);
+    });
+  }, [disCoin]);
+
+  const computeScore = (score) => {
+    setDisScore(score);
+  }
+
+  const computeCoin = (coin) => {
+    setDisCoin(coin);
+  }
+
+  return(
+    <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
+      <SafeAreaView style = {styles.safeArea}>
+        <TouchableOpacity style = {styles.button}
+                          onPress = {() => navigation.navigate("Welcome")}
+        >
+          <MaterialCommunityIcons name = "home"
+                                  size = {screenDimensions.width/12}
+                                  color = "#f6efde"
+          />
+        </TouchableOpacity>
+
+        <View style = {styles.scoreLvlContainer}>
+          <MaterialCommunityIcons name = "trophy-outline"
+                                  size = {screenDimensions.width/12}
+                                  color = "#331005"
+          />
+          <Text style = {styles.scoreLvlText}>{disLevel}</Text>
+          <View style = {styles.gap}/>
+
+          <MaterialIcons name = "grade"
+                          size = {screenDimensions.width/12}
                           color = "#331005"
-            />
-            <Text style = {styles.scoreLvlText}>{disCoin}</Text>
-          </View>
+          />
+          <Text style = {styles.scoreLvlText}>{disScore}</Text>
+          <View style = {styles.gap}/>
 
-          <View style = {styles.displayGameContainer}>
-            <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
-                        score = {disScore} computeScore = {computeScore}
-                        coin = {disCoin} computeCoin = {computeCoin}
-                        crosswordsProc = {crosswords}
-                        master = {master}
-            />
-          </View>
-        </SafeAreaView>
-      </KeyboardAvoidingView>
-    );
+          <FontAwesome6 name = "gem"
+                        size = {screenDimensions.width/14}
+                        color = "#331005"
+          />
+          <Text style = {styles.scoreLvlText}>{disCoin}</Text>
+        </View>
+
+        <View style = {styles.displayGameContainer}>
+          <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
+                      score = {disScore} computeScore = {computeScore}
+                      coin = {disCoin} computeCoin = {computeCoin}
+                      crosswordsProc = {crosswords}
+                      master = {master}
+          />
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
+  );
 };
 
 

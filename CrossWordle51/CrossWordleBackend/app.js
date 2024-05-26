@@ -199,7 +199,7 @@ app.post("/login", (req, res) => {
                     return res.json({ message: "PLogin: You are currently logging in on a device" });
                   }else{
                     // Insert entry into logins table
-                    connection.query("INSERT INTO logins (user_id, status) VALUES (?, ?)", [results[0].id, true], (error, loginInsertResults) => {
+                    connection.query("INSERT INTO logins (user_id) VALUES (?)", [results[0].id], (error, loginInsertResults) => {
                       // Release the connection back to the pool
                       connection.release();
 

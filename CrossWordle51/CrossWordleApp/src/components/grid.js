@@ -63,6 +63,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
     console.log(master[(level - 1) % maxLevel][numGame]);
 
+    // Helper for handleVerify to check for inputs that are not English words
     const [crosswordData, setCrosswordData] = useState(crosswordsProc[(level - 1) % maxLevel][numGame]);
 
     // Update grid/master if crosswordsProc/master are updated/changed in words.js
@@ -79,8 +80,10 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
             alert("Hooray, you have leveled up!");
         }
 
-        setDisStatus("Need to be solved!");
         setDisMatch([]);
+        setDisStatus("Need to be solved!");
+        setRevealedGame("");
+        setDisRevealStatus(false);
     }, [level]);
 
     useEffect(() => {
@@ -234,7 +237,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
             }
         }
 
-        setDisMatch("");
+        setDisMatch([]);
         setDisStatus("Need to be solved!");
         setRevealedGame("");
         setDisRevealStatus(false);

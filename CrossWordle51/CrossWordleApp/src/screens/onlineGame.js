@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal } from "react-native";
 import { useEffect, useState } from "react";
 import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
@@ -59,6 +59,38 @@ const randomPick = (itemList, loopTime, libName) => {
   };
 
 
+  // -------- Leadboard Modal --------
+  const LeadModalDisplay = ({ onClose, data, visible }) => {
+    return (
+      <Modal
+      animationType = "fade"
+      transparent = {true}
+      visible = {visible}
+      onRequestClose = {onClose}
+      >
+      <View style = {styles.modalView}>
+        <View style = {styles.modalConView}>
+          <TouchableOpacity style = {styles.closeButton}
+                            onPress = {onClose}
+          >
+            <MaterialCommunityIcons name = "close-thick"
+                                    size = {screenDimensions.width/18}
+                                    color = "#f6efde"
+            />
+          </TouchableOpacity>
+
+          <Text style = {styles.leadText}>Leaderboard</Text>
+          <Text style = {styles.leadText}>Leaderboard</Text>
+          <Text style = {styles.leadText}>Leaderboard</Text>
+          <Text style = {styles.leadText}>Leaderboard</Text>
+          <Text style = {styles.leadText}>Leaderboard</Text>
+        </View>
+      </View>
+      </Modal>
+    );
+  };
+
+
   // -------- Online Game Screen --------
   OnlineGameScreen = ({navigation, route}) => {
     const maxLevel = 10;
@@ -91,6 +123,8 @@ const randomPick = (itemList, loopTime, libName) => {
     const [disLevel, setDisLevel] = useState(1);
     const [disCoin, setDisCoin] = useState(10);
 
+    const [leadModal, setLeadModal] = useState(false);
+
     // Retrieve score from the database, ONLY ONCE when the app start
     useEffect(() => {
       getScoreCoin()
@@ -105,7 +139,7 @@ const randomPick = (itemList, loopTime, libName) => {
       });
     }, []);
 
-    // Update score to the database when disScore is changed
+    // Update score/coin to the database when disScore/disCoin is changed
     useEffect(() => {
       checkTokenExpiration("OnlineGameScreen")
       .then((isTokenExpired) => {
@@ -115,31 +149,14 @@ const randomPick = (itemList, loopTime, libName) => {
         }else{
           setDisLevel(1 + Math.floor(disScore/10));
 
-           updateScore(disScore)
+          updateScore(disScore)
           .then(() => {
             console.log("onlineGame.js: Score updated successfully");
           })
           .catch((error) => {
             console.error("onlineGame.js - error updateScore()", error);
           });
-        }
-      })
-      .then(() => {
-        console.log("onlineGame.js: Score updated successfully");
-      })
-      .catch((error) => {
-        console.error("onlineGame.js - error Score checkTokenExpiration()", error);
-      });
-    }, [disScore]);
 
-    // Update coin to the database when disCoin is changed
-    useEffect(() => {
-      checkTokenExpiration("OnlineGameScreen")
-      .then((isTokenExpired) => {
-        if(isTokenExpired){
-          alert("Your login session has expired, latest coin has not been updated! Please login again!");
-          navigation.navigate("Login");
-        }else{
           updateCoin(disCoin)
           .then(() => {
             console.log("onlineGame.js: Coin updated successfully");
@@ -150,12 +167,12 @@ const randomPick = (itemList, loopTime, libName) => {
         }
       })
       .then(() => {
-        console.log("onlineGame.js: Coin updated successfully");
+        console.log("onlineGame.js: Score/Coin updated successfully");
       })
       .catch((error) => {
-        console.error("onlineGame.js - error Coin checkTokenExpiration()", error);
+        console.error("onlineGame.js - error Score/Coin checkTokenExpiration()", error);
       });
-    }, [disCoin]);
+    }, [disScore, disCoin]);
 
     const computeScore = (score) => {
       setDisScore(score);
@@ -179,6 +196,15 @@ const randomPick = (itemList, loopTime, libName) => {
             </TouchableOpacity>
 
             <TouchableOpacity style = {styles.button}
+                              onPress = {() => setLeadModal(true)}
+            >
+              <MaterialIcons name = "leaderboard"
+                                      size = {screenDimensions.width/12}
+                                      color = "#f6efde"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity style = {styles.button}
                               onPress = {() => handleLogout()}
             >
               <MaterialCommunityIcons style = {styles.symbol}
@@ -187,6 +213,11 @@ const randomPick = (itemList, loopTime, libName) => {
                                     color = "#f6efde"
               />
             </TouchableOpacity>
+
+            <LeadModalDisplay onClose = {() => setLeadModal(false)}
+                              data = {"text"}
+                              visible = {leadModal}
+            />
           </View>
 
           <View style = {styles.scoreLvlContainer}>
@@ -237,6 +268,38 @@ const styles = StyleSheet.create({
     // Game Screen
     safeArea: {
       flex: 1,
+    },
+
+    modalView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#00000080",
+    },
+
+    modalConView: {
+      backgroundColor: "#f6efde",
+      padding: screenDimensions.width/14,
+      borderRadius: screenDimensions.width/28,
+    },
+
+    closeButton: {
+      width: screenDimensions.width/14,
+      height: screenDimensions.width/14,
+      backgroundColor: "#331005",
+      alignSelf: "flex-end",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: screenDimensions.width/28,
+      marginLeft: screenDimensions.width/2,
+    },
+
+    leadText: {
+      fontSize: screenDimensions.width/12,
+      fontWeight: "bold",
+      color: "#d83f03",
+      alignSelf: "center",
+      marginTop: screenDimensions.height/30,
     },
 
     buttonCon: {

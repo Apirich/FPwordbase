@@ -43,6 +43,25 @@ const verifyToken = (req, res, next) => {
   });
 };
 
+
+// Middleware to extract userId verify JWT token
+const extractUserId = (req, res, next) => {
+  // Split the "Bearer" prefix
+  const token = req.headers["authorization"].split(" ")[1];
+  if (!token) return res.status(403).json({ error: "No token provided" });
+
+  try{
+    const decoded = jwt.decode(token);
+
+    req.userId = decoded.id;
+    next();
+  }catch(error){
+    console.log("extractUserId Error: ", error);
+    return res.status(401).json({ error: "Failed to extract userId" });
+  }
+};
+
+
 // // TEST Attempt to acquire a connection from the pool
 // pool.getConnection((err, connection) => {
 //   if(err){
@@ -212,7 +231,7 @@ app.post("/login", (req, res) => {
 
                         // Calculate the expiration timestamp
                         // Convert current time from milSecond to second, and expTime to seconds
-                        const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600
+                        const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600;
 
                         // Generate JWT token
                         const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: expTime });
@@ -225,6 +244,35 @@ app.post("/login", (req, res) => {
               });
             }
           });
+        }
+      });
+    }
+  });
+});
+
+
+// -------- Delete login (expired) --------
+app.delete("/expired", extractUserId, (req, res) => {
+  // Extracted userId from the middleware
+  const userId = req.userId;
+
+  console.log("Receive expired request");
+
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      console.error("DExpired POOL CONNECTION: Error acquiring connection:", error);
+      return res.status(500).json({ error: "DExpired POOL CONNECTION: Internal Server Error" });
+    }else{
+      // Delete login from the database
+      connection.query("DELETE FROM logins WHERE user_id = ?", [userId], (error, results) => {
+        // Release the connection back to the pool
+        connection.release();
+
+        if(error){
+          return res.status(500).json({ error: "DExpired: Error deleting login" });
+        }else{
+          res.status(204).send();
         }
       });
     }
@@ -258,7 +306,6 @@ app.delete("/logout", verifyToken, (req, res) => {
     }
   });
 });
-
 
 
 // -------- Get score --------

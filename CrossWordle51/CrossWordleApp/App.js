@@ -73,13 +73,11 @@ export default function App(){
     return () => {
       AppState.removeEventListener("change", appStateChange);
     };
-
-
   }, []);
 
   useEffect(() => {
     if(appState === "active"){
-      checkTokenExpiration("appState");
+      checkTokenExpiration(appState);
     }
   }, [appState]);
 

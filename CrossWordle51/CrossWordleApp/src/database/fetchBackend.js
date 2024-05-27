@@ -80,13 +80,10 @@ export const handleLogin = ({email, password}) => {
         // If not currently logging in on another device, proceed with storing token
         return AsyncStorage.setItem("token", data.token)
         .then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()))
-        .then(() => {
-            // navigation.navigate("OnlineGame");
+        .then(() => {// Successful logged in
             NavigationService.navigate("OnlineGame");
         });
-    }).catch((error) => {
-        // console.error("fetchBackend.js - handleLogin(): Error logging in:", error)
-
+    }).catch((error) => {// Invalid email or password
         if(error.message == "401"){
             alert("Invalid email or password!");
         }
@@ -97,19 +94,31 @@ export const handleLogin = ({email, password}) => {
 export const checkTokenExpiration = (currentRouteName) => {
     return AsyncStorage.getItem("tokenExpTimestamp")
     .then((tokenExpTimestamp) => {
-        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000)){
-            if(currentRouteName === "OnlineModeScreen"){
-                // navigation.navigate("OnlineGame");
+        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000)){// Token valid
+            if(currentRouteName === "OnlineModeScreen"){// Online mode
                 NavigationService.navigate("OnlineGame");
-            }else if(currentRouteName === "OnlineGameScreen"){
+            }else if(currentRouteName === "OnlineGameScreen"){// Online game
                 return false;
             }
-        }else{
-            if(currentRouteName === "OnlineModeScreen" || (currentRouteName === "active" && tokenExpTimestamp)){
-                // navigation.navigate("Login");
-                NavigationService.navigate("Login");
-            }else if(currentRouteName === "OnlineGameScreen"){
-                return true;
+        }else{// No token or token expired
+            if(tokenExpTimestamp){// Token expired
+                return handleTokenExpired()
+                .then(() => {
+                    if(currentRouteName === "OnlineModeScreen"){// Online mode
+                        NavigationService.navigate("Login");
+                    }else if(currentRouteName === "active"){// appState background
+                        NavigationService.navigate("OnlineMode");
+                    }else if(currentRouteName === "OnlineGameScreen"){// Online game
+                        return true;
+                    }
+                })
+                .catch(error => {
+                    console.error("fetchBackend.js - checkTokenExpiration(): Error navigating after handleTokenExpired()", error);
+                });
+            }else{// No token
+                if(currentRouteName === "OnlineModeScreen"){// Online mode
+                    NavigationService.navigate("Login");
+                }
             }
         }
     })
@@ -119,48 +128,92 @@ export const checkTokenExpiration = (currentRouteName) => {
 };
 
 
-export const handleLogout = () => {
+// Delete login (expired)
+const handleTokenExpired = () => {
     return AsyncStorage.getItem("token")
-        .then((token) => {
-            if(!token){
-                throw new Error("fetchBackend.js - handleLogout(): Token not found");
+    .then((token) => {
+        if(!token){
+            throw new Error("fetchBackend.js - handleTokenExpired(): Token not found");
+        }
+
+        return fetch("http://192.168.12.205:3000/expired", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then((response) => {
+            // Check if the response is successful
+            if(!response.ok){
+                throw new Error("fetchBackend.js - handleTokenExpired(): Failed to update coin");
             }
 
-            return fetch("http://192.168.12.205:3000/logout", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            .then((response) => {
-                // Check if the response is successful
-                if(!response.ok){
-                    throw new Error("fetchBackend.js - handleLogout(): Failed to update coin");
-                }
+            if(response.status === 204){
+                console.log("fetchBackend.js - handleTokenExpired(): Successfully deleted from backend logins table");
 
-                if(response.status === 204){
-                    console.log("fetchBackend.js - handleLogout(): User successfully logout (delete from backend logins table)");
-
-                    return AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
-                    .then(() => {
-                        console.log("fetchBackend.js - handleLogout(): Removed token, tokenExpTimestamp");
-
-                        // navigation.navigate("OnlineMode");
-                        NavigationService.navigate("OnlineMode");
-                    });
-                }
-            })
-            .catch((error) => {
-                console.error("fetchBackend.js - handleLogout(): Error fetching:", error);
-                throw error;
-            });
+                return AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
+                .then(() => {
+                    console.log("fetchBackend.js - handleTokenExpired(): Removed token, tokenExpTimestamp");
+                });
+            }
         })
         .catch((error) => {
-            console.error("fetchBackend.js - handleLogout(): Error retrieving token from AsyncStorage:", error);
+            console.error("fetchBackend.js - handleTokenExpired(): Error fetching:", error);
             throw error;
         });
+    })
+    .catch((error) => {
+        console.error("fetchBackend.js - handleTokenExpired(): Error retrieving token from AsyncStorage:", error);
+        throw error;
+    });
+};
+
+
+// Delete login (logout)
+export const handleLogout = () => {
+    return AsyncStorage.getItem("token")
+    .then((token) => {
+        if(!token){
+            throw new Error("fetchBackend.js - handleLogout(): Token not found");
+        }
+
+        return fetch("http://192.168.12.205:3000/logout", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then((response) => {
+            // Check if the response is successful
+            if(!response.ok){
+                throw new Error("fetchBackend.js - handleLogout(): Failed to update coin");
+            }
+
+            if(response.status === 204){
+                console.log("fetchBackend.js - handleLogout(): User successfully logout (delete from backend logins table)");
+
+                return AsyncStorage.multiRemove(["token", "tokenExpTimestamp"])
+                .then(() => {
+                    console.log("fetchBackend.js - handleLogout(): Removed token, tokenExpTimestamp");
+
+                    // navigation.navigate("OnlineMode");
+                    NavigationService.navigate("OnlineMode");
+                });
+            }
+        })
+        .catch((error) => {
+            console.error("fetchBackend.js - handleLogout(): Error fetching:", error);
+            throw error;
+        });
+    })
+    .catch((error) => {
+        console.error("fetchBackend.js - handleLogout(): Error retrieving token from AsyncStorage:", error);
+        throw error;
+    });
 };
 
 
@@ -260,7 +313,7 @@ export const updateCoin = (coin) => {
 };
 
 
-// // Function to reset AsyncStorage
+// // Function to reset AsyncStorage - for DEBUGGING ONLY
 // export const resetAsyncStorage = () => {
 //     return AsyncStorage.clear()
 //     .then(() => {

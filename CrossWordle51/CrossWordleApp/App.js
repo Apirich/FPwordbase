@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppState } from "react-native";
 
 //
-import { checkTokenExpiration } from "./src/database/fetchBackend";
+import { checkTokenExpiration, resetAsyncStorage } from "./src/database/fetchBackend";
 import NavigationService from "./src/navigations/navService"
 
 // Import screens
@@ -65,6 +65,7 @@ export default function App(){
 
 
   useEffect(() => {
+    // resetAsyncStorage();
     processLoading();
 
     AppState.addEventListener("change", appStateChange);

@@ -139,40 +139,49 @@ const randomPick = (itemList, loopTime, libName) => {
       });
     }, []);
 
-    // Update score/coin to the database when disScore/disCoin is changed
+
+    // Update score to the database when disScore is changed
     useEffect(() => {
       checkTokenExpiration("OnlineGameScreen")
-      .then((isTokenExpired) => {
-        if(isTokenExpired){
-          alert("Your login session has expired, latest score has not been updated! Please login again!");
-          navigation.navigate("Login");
-        }else{
-          setDisLevel(1 + Math.floor(disScore/10));
+      .then(() => {
+        setDisLevel(1 + Math.floor(disScore/10));
 
-          updateScore(disScore)
-          .then(() => {
-            console.log("onlineGame.js: Score updated successfully");
-          })
-          .catch((error) => {
-            console.error("onlineGame.js - error updateScore()", error);
-          });
-
-          updateCoin(disCoin)
-          .then(() => {
-            console.log("onlineGame.js: Coin updated successfully");
-          })
-          .catch((error) => {
-            console.error("onlineGame.js - error updateCoin()", error);
-          });
-        }
+        updateScore(disScore)
+        .then(() => {
+          console.log("onlineGame.js: Score updated successfully");
+        })
+        .catch((error) => {
+          console.error("onlineGame.js - error updateScore()", error);
+        });
       })
       .then(() => {
-        console.log("onlineGame.js: Score/Coin updated successfully");
+        console.log("onlineGame.js: Score updated successfully");
       })
       .catch((error) => {
-        console.error("onlineGame.js - error Score/Coin checkTokenExpiration()", error);
+        console.error("onlineGame.js - error Score checkTokenExpiration()", error);
       });
-    }, [disScore, disCoin]);
+    }, [disScore]);
+
+
+    // Update coin to the database when disCoin is changed
+    useEffect(() => {
+      checkTokenExpiration("OnlineGameScreen")
+      .then(() => {
+        updateCoin(disCoin)
+        .then(() => {
+          console.log("onlineGame.js: Coin updated successfully");
+        })
+        .catch((error) => {
+          console.error("onlineGame.js - error updateCoin()", error);
+        });
+      })
+      .then(() => {
+        console.log("onlineGame.js: Coin updated successfully");
+      })
+      .catch((error) => {
+        console.error("onlineGame.js - error Coin checkTokenExpiration()", error);
+      });
+    }, [disCoin]);
 
     const computeScore = (score) => {
       setDisScore(score);

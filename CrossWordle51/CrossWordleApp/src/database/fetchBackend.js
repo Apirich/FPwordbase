@@ -76,7 +76,7 @@ export const handleLogin = ({email, password}) => {
             return;
         }
 
-        console.log("fetchBackend.js - handleLogin(): token:", data.token);
+        console.log("fetchBackend.js - handleLogin(): token received");
         // If not currently logging in on another device, proceed with storing token
         return AsyncStorage.setItem("token", data.token)
         .then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()))
@@ -94,27 +94,35 @@ export const handleLogin = ({email, password}) => {
 export const checkTokenExpiration = (currentRouteName) => {
     return AsyncStorage.getItem("tokenExpTimestamp")
     .then((tokenExpTimestamp) => {
-        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000)){// Token valid
+        // Math.floor(Date.now() / 1000) is 25 seconds behind backend Math.floor(Date.now() / 1000)
+        // Add extra 3 mins (180) to guarantee front end expire before backend
+        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000) + 205){// Token valid
             if(currentRouteName === "OnlineModeScreen"){// Online mode
                 NavigationService.navigate("OnlineGame");
-            }else if(currentRouteName === "OnlineGameScreen"){// Online game
-                return false;
             }
         }else{// No token or token expired
             if(tokenExpTimestamp){// Token expired
-                return handleTokenExpired()
-                .then(() => {
-                    if(currentRouteName === "OnlineModeScreen"){// Online mode
-                        NavigationService.navigate("Login");
-                    }else if(currentRouteName === "active"){// appState background
-                        NavigationService.navigate("OnlineMode");
-                    }else if(currentRouteName === "OnlineGameScreen"){// Online game
-                        return true;
-                    }
-                })
-                .catch(error => {
-                    console.error("fetchBackend.js - checkTokenExpiration(): Error navigating after handleTokenExpired()", error);
-                });
+                if(currentRouteName === "OnlineGameScreen"){// Online game
+                    return handleRefreshToken()
+                    .then(() => {
+                        console.log("fetchBackend.js - checkTokenExpiration(): Successfully callback after handleRefreshToken()");
+                    })
+                    .catch(error => {
+                        console.error("fetchBackend.js - checkTokenExpiration(): Error callback after handleRefreshToken()", error);
+                    });
+                }else{// Online mode or appState background
+                    return handleTokenExpired()
+                    .then(() => {
+                        if(currentRouteName === "OnlineModeScreen"){// Online mode
+                            NavigationService.navigate("Login");
+                        }else if(currentRouteName === "active"){// appState background
+                            NavigationService.navigate("OnlineMode");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("fetchBackend.js - checkTokenExpiration(): Error navigating after handleTokenExpired()", error);
+                    });
+                }
             }else{// No token
                 if(currentRouteName === "OnlineModeScreen"){// Online mode
                     NavigationService.navigate("Login");
@@ -128,7 +136,51 @@ export const checkTokenExpiration = (currentRouteName) => {
 };
 
 
-// Delete login (expired)
+// Refresh token (after expired)
+const handleRefreshToken = () => {
+    return AsyncStorage.getItem("token")
+    .then((token) => {
+        if(!token){
+            throw new Error("fetchBackend.js - handleRefreshToken(): Token not found");
+        }
+
+        return fetch("http://192.168.12.205:3000/refresh", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then((response) => {
+            console.log("fetchBackend.js - handleRefreshToken(): response status:", response.status);
+
+            // If successfully refresh token or there is backend internal error refreshing
+            if(response.status == 200){
+                return response.json();
+            }else{
+                throw new Error(response.status);
+            }
+        })
+        .then((data) => {
+            console.log("fetchBackend.js - handleRefreshToken(): token received");
+            // Override stored token/tokenExpTimestamp with new token/tokenExpTimestamp
+            return AsyncStorage.setItem("token", data.token)
+            .then(() => AsyncStorage.setItem("tokenExpTimestamp", data.expTimestamp.toString()));
+        })
+        .catch((error) => {
+            console.error("fetchBackend.js - handleRefreshToken(): Error fetching:", error);
+            throw error;
+        });
+    })
+    .catch((error) => {
+        console.error("fetchBackend.js - handleRefreshToken(): Error retrieving token from AsyncStorage:", error);
+        throw error;
+    });
+};
+
+
+// Delete login (after expired)
 const handleTokenExpired = () => {
     return AsyncStorage.getItem("token")
     .then((token) => {
@@ -313,13 +365,13 @@ export const updateCoin = (coin) => {
 };
 
 
-// // Function to reset AsyncStorage - for DEBUGGING ONLY
-// export const resetAsyncStorage = () => {
-//     return AsyncStorage.clear()
-//     .then(() => {
-//         console.log("AsyncStorage cleared successfully.");
-//     })
-//     .catch((error) => {
-//         console.error("Error clearing AsyncStorage:", error);
-//     });
-// };
+// Function to reset AsyncStorage - for DEBUGGING ONLY
+export const resetAsyncStorage = () => {
+    return AsyncStorage.clear()
+    .then(() => {
+        console.log("AsyncStorage cleared successfully.");
+    })
+    .catch((error) => {
+        console.error("Error clearing AsyncStorage:", error);
+    });
+};

@@ -251,6 +251,27 @@ app.post("/login", (req, res) => {
 });
 
 
+// -------- Refresh token (after expired) --------
+app.post("/refresh", extractUserId, (req, res) => {
+  // Extracted userId from the middleware
+  const userId = req.userId;
+
+  console.log("Receive refresh request");
+
+  // Token expiration time
+  const expTime = "1h";
+
+  // Calculate the expiration timestamp
+  // Convert current time from milSecond to second, and expTime to seconds
+  const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600;
+
+  // Generate JWT token
+  const token = jwt.sign({ id: userId }, secretKey, { expiresIn: expTime });
+
+  res.json({ message: "PRefresh: Successful refresh token", token, expTimestamp });
+});
+
+
 // -------- Delete login (expired) --------
 app.delete("/expired", extractUserId, (req, res) => {
   // Extracted userId from the middleware

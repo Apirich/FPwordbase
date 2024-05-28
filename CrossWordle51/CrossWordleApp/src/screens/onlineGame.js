@@ -82,38 +82,37 @@ const randomPick = (itemList, loopTime, libName) => {
   const LeadModalDisplay = ({ onClose, data, visible }) => {
     // console.log(data);
     return (
-      <Modal
-      animationType = "fade"
-      transparent = {true}
-      visible = {visible}
-      onRequestClose = {onClose}
+      <Modal animationType = "fade"
+             transparent = {true}
+             visible = {visible}
+             onRequestClose = {onClose}
       >
-      <View style = {styles.modalView}>
-        <View style = {styles.modalConView}>
-          <TouchableOpacity style = {styles.closeButton}
-                            onPress = {onClose}
-          >
-            <MaterialCommunityIcons name = "close-thick"
-                                    size = {screenDimensions.width/18}
-                                    color = "#f6efde"
-            />
-          </TouchableOpacity>
+        <View style = {styles.modalView}>
+          <View style = {styles.modalConView}>
+            <TouchableOpacity style = {styles.closeButton}
+                              onPress = {onClose}
+            >
+              <MaterialCommunityIcons name = "close-thick"
+                                      size = {screenDimensions.width/18}
+                                      color = "#f6efde"
+              />
+            </TouchableOpacity>
 
-          {data.map((d, i) => (
-            <Fragment key = {i}>
+            {data.map((d, i) => (
+              <Fragment key = {i}>
 
-              <Text style = {styles.leadScoreText}>
-                <FontAwesome6 name = "award"
-                              size = {screenDimensions.width/16}
-                              color = "#331005"
-                />
-              </Text>
-              <Text style = {styles.leadScoreText}>Score {d.score}</Text>
-              <Text style = {styles.leadText}>{d.username}</Text>
-            </Fragment>
-          ))}
+                <Text style = {styles.leadScoreText}>
+                  <FontAwesome6 name = "award"
+                                size = {screenDimensions.width/16}
+                                color = "#331005"
+                  />
+                </Text>
+                <Text style = {styles.leadScoreText}>Score {d.score}</Text>
+                <Text style = {styles.leadText}>{d.username}</Text>
+              </Fragment>
+            ))}
+          </View>
         </View>
-      </View>
       </Modal>
     );
   };

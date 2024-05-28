@@ -101,7 +101,14 @@ const randomPick = (itemList, loopTime, libName) => {
 
           {data.map((d, i) => (
             <Fragment key = {i}>
-              <Text style = {styles.leadOrderText}>{i + 1}</Text>
+
+              <Text style = {styles.leadScoreText}>
+                <FontAwesome6 name = "award"
+                              size = {screenDimensions.width/16}
+                              color = "#331005"
+                />
+              </Text>
+              <Text style = {styles.leadScoreText}>Score {d.score}</Text>
               <Text style = {styles.leadText}>{d.username}</Text>
             </Fragment>
           ))}
@@ -175,7 +182,7 @@ const randomPick = (itemList, loopTime, libName) => {
       })
       .then(() => {
         if(isMounted){
-          updateCoin(disCoin)
+          updateCoin(disCoin);
         };
       })
       .then(() => {
@@ -320,9 +327,9 @@ const styles = StyleSheet.create({
       marginLeft: screenDimensions.width/2,
     },
 
-    leadOrderText: {
+    leadScoreText: {
       fontSize: screenDimensions.width/16,
-      fontWeight: "bold",
+      fontWeight: 300,
       color: "#331005",
       alignSelf: "center",
       marginTop: screenDimensions.height/30,
@@ -330,7 +337,7 @@ const styles = StyleSheet.create({
 
     leadText: {
       fontSize: screenDimensions.width/16,
-      fontWeight: 300,
+      fontWeight: "bold",
       color: "#d83f03",
       alignSelf: "center",
       marginTop: screenDimensions.height/30,

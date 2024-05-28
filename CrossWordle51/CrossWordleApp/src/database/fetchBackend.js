@@ -95,8 +95,8 @@ export const checkTokenExpiration = (currentRouteName) => {
     return AsyncStorage.getItem("tokenExpTimestamp")
     .then((tokenExpTimestamp) => {
         // Math.floor(Date.now() / 1000) is 25 seconds behind backend Math.floor(Date.now() / 1000)
-        // Add extra 3 mins (180) to guarantee front end expire before backend
-        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000) + 205){// Token valid
+        // Add extra 5 mins (300) to guarantee front end expire before backend
+        if(tokenExpTimestamp && parseInt(tokenExpTimestamp) > Math.floor(Date.now() / 1000) + 325){// Token valid
             if(currentRouteName === "OnlineModeScreen"){// Online mode
                 NavigationService.navigate("OnlineGame");
             }

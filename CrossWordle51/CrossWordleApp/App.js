@@ -6,7 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator} from "@react-navigation/stack";
 
 // Import NetInfo (NetInfo has event listenter)
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo from "@react-native-community/netinfo";
 
 // Import AsyncStorage and AppState
 import AsyncStorage from "@react-native-async-storage/async-storage";

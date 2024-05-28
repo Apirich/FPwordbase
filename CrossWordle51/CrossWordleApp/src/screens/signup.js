@@ -8,57 +8,57 @@ const screenDimensions = Dimensions.get("screen");
 
 // -------- Signup Screen --------
 SignupScreen = ({navigation, route}) => {
-    const [username, setUsername] = useState();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+  const [username, setUsername] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
 
-    return(
-      <View style = {styles.container}>
-        <SafeAreaView>
-          <TouchableOpacity style = {styles.backButton}
-                            onPress = {() => navigation.navigate("OnlineMode")}
-          >
-            <Ionicons name = "chevron-back-outline"
-                      size = {screenDimensions.width/18}
-                      color = "#f6efde"
-            />
-          </TouchableOpacity>
-
-          <MaterialCommunityIcons style = {styles.symbol}
-                                  name = "account-multiple-plus-outline"
-                                  size = {screenDimensions.width/7}
-                                  color = "#d83f03"
+  return(
+    <View style = {styles.container}>
+      <SafeAreaView>
+        <TouchableOpacity style = {styles.backButton}
+                          onPress = {() => navigation.navigate("OnlineMode")}
+        >
+          <Ionicons name = "chevron-back-outline"
+                    size = {screenDimensions.width/18}
+                    color = "#f6efde"
           />
+        </TouchableOpacity>
 
-          <TextInput
-            placeholder = "Username"
-            value = {username}
-            onChangeText = {text => setUsername(text)}
-            style = {styles.input}
-          />
+        <MaterialCommunityIcons style = {styles.symbol}
+                                name = "account-multiple-plus-outline"
+                                size = {screenDimensions.width/7}
+                                color = "#d83f03"
+        />
 
-          <TextInput
-            placeholder = "Email"
-            value = {email}
-            onChangeText = {text => setEmail(text)}
-            style = {[styles.input, {marginTop: screenDimensions.height/60}]}
-          />
+        <TextInput
+          placeholder = "Username"
+          value = {username}
+          onChangeText = {text => setUsername(text)}
+          style = {styles.input}
+        />
 
-          <TextInput
-            placeholder = "Password"
-            secureTextEntry = {true}
-            value={password}
-            onChangeText={text => setPassword(text)}
-            style = {[styles.input, {marginTop: screenDimensions.height/60}]}
-          />
+        <TextInput
+          placeholder = "Email"
+          value = {email}
+          onChangeText = {text => setEmail(text)}
+          style = {[styles.input, {marginTop: screenDimensions.height/60}]}
+        />
 
-          <TouchableOpacity style = {styles.button}
-                            onPress = {() => handleSignUp({username, email, password})}>
-            <Text style = {styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
+        <TextInput
+          placeholder = "Password"
+          secureTextEntry = {true}
+          value={password}
+          onChangeText={text => setPassword(text)}
+          style = {[styles.input, {marginTop: screenDimensions.height/60}]}
+        />
+
+        <TouchableOpacity style = {styles.button}
+                          onPress = {() => handleSignUp({username, email, password})}>
+          <Text style = {styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </View>
-    );
+  );
 };
 
 // -------- Styles --------

@@ -113,20 +113,36 @@ OfflineGameScreen = ({navigation, route}) => {
 
   // Update score to the database when disScore is changed
   useEffect(() => {
-    setDisLevel(1 + Math.floor(disScore/10));
+    let isMounted = true;
 
-    updateScore(disScore)
-    .catch((error) => {
-      console.error('Error updating score:', error);
-    });
+    if(isMounted){
+      setDisLevel(1 + Math.floor(disScore/10));
+
+      updateScore(disScore)
+      .catch((error) => {
+        console.error("offlineGame.js: Error updating score:", error);
+      });
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [disScore]);
 
   // Update coin to the database when disCoin is changed
   useEffect(() => {
-    updateCoin(disCoin)
-    .catch((error) => {
-      console.error('Error updating coin:', error);
-    });
+    let isMounted = true;
+
+    if(isMounted){
+      updateCoin(disCoin)
+      .catch((error) => {
+        console.error("offlineGame.js: Error updating coin:", error);
+      });
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [disCoin]);
 
   const computeScore = (score) => {

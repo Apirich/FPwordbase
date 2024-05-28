@@ -365,13 +365,45 @@ export const updateCoin = (coin) => {
 };
 
 
-// Function to reset AsyncStorage - for DEBUGGING ONLY
-export const resetAsyncStorage = () => {
-    return AsyncStorage.clear()
-    .then(() => {
-        console.log("AsyncStorage cleared successfully.");
+// Get lead scores
+export const getLead = () => {
+    return AsyncStorage.getItem("token")
+    .then((token) => {
+        if(!token){
+            throw new Error("fetchBackend.js - getLead(): Token not found");
+        }
+
+        const headers = {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Authorization": `Bearer ${token}`,
+        };
+
+        // Make HTTP GET request to retrieve lead scores
+        return fetch("http://192.168.12.205:3000/lead", {headers});
     })
-    .catch((error) => {
-        console.error("Error clearing AsyncStorage:", error);
+    .then((response) => {
+        // Check if responses are successful
+        if(!response.ok){
+            throw new Error("fetchBackend.js - getLead(): Failed to fetch data");
+        }
+
+        // Parse response data
+        return response.json();
+    })
+    .then((responseJS) => {
+        return responseJS.leadScores;
     });
 };
+
+
+// // Function to reset AsyncStorage - for DEBUGGING ONLY
+// export const resetAsyncStorage = () => {
+//     return AsyncStorage.clear()
+//     .then(() => {
+//         console.log("AsyncStorage cleared successfully.");
+//     })
+//     .catch((error) => {
+//         console.error("Error clearing AsyncStorage:", error);
+//     });
+// };

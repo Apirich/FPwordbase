@@ -4,28 +4,28 @@ const screenDimensions = Dimensions.get("screen");
 
 // -------- Welcome Screen --------
 WelcomeScreen = ({navigation, route}) => {
-    const { internetChecking } = route.params;
+  const { internetChecking } = route.params;
 
-    return(
-      <View style = {styles.container}>
-        <SafeAreaView>
-          <Text style = {styles.appNameText}>Crosswordle</Text>
+  return(
+    <View style = {styles.container}>
+      <SafeAreaView>
+        <Text style = {styles.appNameText}>Crosswordle</Text>
 
-          <TouchableOpacity style = {[styles.button, internetChecking ? null : styles.disableButton]}
-                            onPress = {() => navigation.navigate("OnlineMode")}
-                            disabled = {internetChecking ? false : true}
-          >
-            <Text style = {[styles.buttonText, internetChecking ? null : styles.disableButton]}>Online Mode</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style = {[styles.button, internetChecking ? null : styles.disableButton]}
+                          onPress = {() => navigation.navigate("OnlineMode")}
+                          disabled = {internetChecking ? false : true}
+        >
+          <Text style = {[styles.buttonText, internetChecking ? null : styles.disableButton]}>Online Mode</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style = {[styles.button, {marginTop: screenDimensions.height/20}]}
-                            onPress = {() => navigation.navigate("OfflineGame")}
-          >
-            <Text style = {[styles.buttonText]}>Offline Mode</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style = {[styles.button, {marginTop: screenDimensions.height/20}]}
+                          onPress = {() => navigation.navigate("OfflineGame")}
+        >
+          <Text style = {[styles.buttonText]}>Offline Mode</Text>
+        </TouchableOpacity>
       </SafeAreaView>
-      </View>
-    );
+    </View>
+  );
 };
 
 // -------- Styles --------

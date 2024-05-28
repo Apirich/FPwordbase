@@ -4,20 +4,20 @@ const screenDimensions = Dimensions.get("screen");
 
 // -------- Splash Screen --------
 SplashScreen = (internetStatus) => {
-    return(
-      <View style = {styles.container}>
-        <SafeAreaView>
-          <Image
-            style = {styles.logo}
-            source = {require("../../assets/crosswordleLogo.png")}
-          />
+  return(
+    <View style = {styles.container}>
+      <SafeAreaView>
+        <Image
+          style = {styles.logo}
+          source = {require("../../assets/crosswordleLogo.png")}
+        />
 
-          <ActivityIndicator size = {"large"}/>
+        <ActivityIndicator size = {"large"}/>
 
-          <Text>{internetStatus ? "" : "Your internet connection status is offline, only Offline Mode will be available!"}</Text>
+        <Text>{internetStatus ? "" : "Your internet connection status is offline, only Offline Mode will be available!"}</Text>
       </SafeAreaView>
-      </View>
-    );
+    </View>
+  );
 };
 
 // -------- Styles --------

@@ -1,11 +1,11 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal } from "react-native";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
 import { generate, count } from "random-words";
 
 import DisplayGame from "../components/grid";
-import { getScoreCoin, updateScore, updateCoin, handleLogout, checkTokenExpiration } from "../database/fetchBackend";
+import { getScoreCoin, updateScore, updateCoin, handleLogout, checkTokenExpiration, getLead } from "../database/fetchBackend";
 
 const screenDimensions = Dimensions.get("screen");
 
@@ -59,8 +59,28 @@ const randomPick = (itemList, loopTime, libName) => {
   };
 
 
+  // -------- Process data for Leadboard Modal --------
+  const procLeadData = (configLeadModal, configLeadData) => {
+    checkTokenExpiration("OnlineGameScreen")
+    .then(() => {
+      getLead()
+      .then((data) => {
+        configLeadModal(true);
+        configLeadData(data);
+      })
+      .catch(error => {
+        console.error("onlineGame.js - error procLeadData():", error);
+      });
+    })
+    .catch((error) => {
+      console.error("onlineGame.js - error procLeadData checkTokenExpiration()", error);
+    });
+  };
+
+
   // -------- Leadboard Modal --------
   const LeadModalDisplay = ({ onClose, data, visible }) => {
+    // console.log(data);
     return (
       <Modal
       animationType = "fade"
@@ -79,11 +99,12 @@ const randomPick = (itemList, loopTime, libName) => {
             />
           </TouchableOpacity>
 
-          <Text style = {styles.leadText}>Leaderboard</Text>
-          <Text style = {styles.leadText}>Leaderboard</Text>
-          <Text style = {styles.leadText}>Leaderboard</Text>
-          <Text style = {styles.leadText}>Leaderboard</Text>
-          <Text style = {styles.leadText}>Leaderboard</Text>
+          {data.map((d, i) => (
+            <Fragment key = {i}>
+              <Text style = {styles.leadOrderText}>{i + 1}</Text>
+              <Text style = {styles.leadText}>{d.username}</Text>
+            </Fragment>
+          ))}
         </View>
       </View>
       </Modal>
@@ -124,6 +145,7 @@ const randomPick = (itemList, loopTime, libName) => {
     const [disCoin, setDisCoin] = useState(10);
 
     const [leadModal, setLeadModal] = useState(false);
+    const [leadData, setLeadData] = useState([]);
 
     // Retrieve score from the database, ONLY ONCE when the app start
     useEffect(() => {
@@ -140,48 +162,35 @@ const randomPick = (itemList, loopTime, libName) => {
     }, []);
 
 
-    // Update score to the database when disScore is changed
+    // Update score/coin to the database when disScore/disCoin is changed
     useEffect(() => {
+      let isMounted = true;
+
       checkTokenExpiration("OnlineGameScreen")
       .then(() => {
-        setDisLevel(1 + Math.floor(disScore/10));
-
-        updateScore(disScore)
-        .then(() => {
-          console.log("onlineGame.js: Score updated successfully");
-        })
-        .catch((error) => {
-          console.error("onlineGame.js - error updateScore()", error);
-        });
+        if(isMounted){
+          setDisLevel(1 + Math.floor(disScore/10));
+          updateScore(disScore);
+        }
       })
       .then(() => {
-        console.log("onlineGame.js: Score updated successfully");
+        if(isMounted){
+          updateCoin(disCoin)
+        };
+      })
+      .then(() => {
+        if(isMounted){
+          console.log("onlineGame.js: Score/Coin updated successfully")
+        };
       })
       .catch((error) => {
-        console.error("onlineGame.js - error Score checkTokenExpiration()", error);
+        console.error("onlineGame.js - error Score/Coin checkTokenExpiration()", error);
       });
-    }, [disScore]);
 
-
-    // Update coin to the database when disCoin is changed
-    useEffect(() => {
-      checkTokenExpiration("OnlineGameScreen")
-      .then(() => {
-        updateCoin(disCoin)
-        .then(() => {
-          console.log("onlineGame.js: Coin updated successfully");
-        })
-        .catch((error) => {
-          console.error("onlineGame.js - error updateCoin()", error);
-        });
-      })
-      .then(() => {
-        console.log("onlineGame.js: Coin updated successfully");
-      })
-      .catch((error) => {
-        console.error("onlineGame.js - error Coin checkTokenExpiration()", error);
-      });
-    }, [disCoin]);
+      return () => {
+        isMounted = false;
+      };
+    }, [disScore, disCoin]);
 
     const computeScore = (score) => {
       setDisScore(score);
@@ -189,6 +198,14 @@ const randomPick = (itemList, loopTime, libName) => {
 
     const computeCoin = (coin) => {
       setDisCoin(coin);
+    }
+
+    const configLeadModal = (leadModal) => {
+      setLeadModal(leadModal);
+    }
+
+    const configLeadData = (leadData) => {
+      setLeadData(leadData);
     }
 
     return(
@@ -205,7 +222,7 @@ const randomPick = (itemList, loopTime, libName) => {
             </TouchableOpacity>
 
             <TouchableOpacity style = {styles.button}
-                              onPress = {() => setLeadModal(true)}
+                              onPress = {() => procLeadData(configLeadModal, configLeadData)}
             >
               <MaterialIcons name = "leaderboard"
                                       size = {screenDimensions.width/12}
@@ -224,7 +241,7 @@ const randomPick = (itemList, loopTime, libName) => {
             </TouchableOpacity>
 
             <LeadModalDisplay onClose = {() => setLeadModal(false)}
-                              data = {"text"}
+                              data = {leadData}
                               visible = {leadModal}
             />
           </View>
@@ -303,9 +320,17 @@ const styles = StyleSheet.create({
       marginLeft: screenDimensions.width/2,
     },
 
-    leadText: {
-      fontSize: screenDimensions.width/12,
+    leadOrderText: {
+      fontSize: screenDimensions.width/16,
       fontWeight: "bold",
+      color: "#331005",
+      alignSelf: "center",
+      marginTop: screenDimensions.height/30,
+    },
+
+    leadText: {
+      fontSize: screenDimensions.width/16,
+      fontWeight: 300,
       color: "#d83f03",
       alignSelf: "center",
       marginTop: screenDimensions.height/30,

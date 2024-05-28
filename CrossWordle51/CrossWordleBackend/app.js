@@ -451,6 +451,45 @@ app.post("/updateCoin", verifyToken, (req, res) => {
 });
 
 
+// -------- Get lead users --------
+app.get("/lead", verifyToken, (req, res) => {
+  console.log("Receive lead request");
+
+  // Obtain a connection from the pool
+  pool.getConnection((error, connection) => {
+    if(error){
+      console.error("GScore POOL CONNECTION: Error acquiring connection:", error);
+      return res.status(500).json({ error: "GScore POOL CONNECTION: Internal Server Error" });
+    }else{
+      // SQL command
+      const query = `SELECT scores.score, users.username
+                    FROM scores
+                    JOIN users ON scores.user_id = users.id
+                    WHERE scores.score != 0
+                    ORDER BY scores.score DESC
+                    LIMIT 3;`
+
+      // Retrieve score from the database
+      connection.query(query, (error, results) => {
+        // Release the connection back to the pool
+        connection.release();
+
+        if(error){
+          return res.status(500).json({ error: "GScore: Error retrieving lead scores" });
+        }else{
+          if(results.length === 0){
+            return res.status(404).json({ error: "GScore: Score not found for this user" });
+          }else{
+            const leadScores = results;
+            res.json({leadScores});
+          }
+        }
+      });
+    }
+  });
+});
+
+
 app.listen(port, () => {
   console.log(`Server is listening at port ${port}`);
 });

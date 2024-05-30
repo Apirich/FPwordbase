@@ -8,9 +8,9 @@ const getScore = () => {
     db.transaction(
       (tx) => {
         tx.executeSql("SELECT value FROM scores LIMIT 1", [], (_, { rows }) => {
-          if (rows.length > 0) {
+          if(rows.length > 0){
             resolve(rows.item(0).value);
-          } else {
+          }else{
             resolve(0); // Return 0 if score not found
           }
         });
@@ -47,9 +47,9 @@ const getCoin = () => {
     db.transaction(
       (tx) => {
         tx.executeSql("SELECT value FROM coins LIMIT 1", [], (_, { rows }) => {
-          if (rows.length > 0) {
+          if(rows.length > 0){
             resolve(rows.item(0).value);
-          } else {
+          }else{
             resolve(10); // Return 10 if coins not found
           }
         });

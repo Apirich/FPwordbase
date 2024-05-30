@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal, ScrollView } from "react-native";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
 import { generate, count } from "random-words";
@@ -60,7 +60,8 @@ const randomPick = (itemList, loopTime, libName) => {
 
 
   // -------- Process data for Leadboard Modal --------
-  const procLeadData = (configLeadModal, configLeadData) => {
+  // Export for testing only
+  export const procLeadData = (configLeadModal, configLeadData) => {
     checkTokenExpiration("OnlineGameScreen")
     .then(() => {
       getLead()
@@ -79,7 +80,8 @@ const randomPick = (itemList, loopTime, libName) => {
 
 
   // -------- Leadboard Modal --------
-  const LeadModalDisplay = ({ onClose, data, visible }) => {
+  // Export for testing only
+  export const LeadModalDisplay = ({ onClose, data, visible }) => {
     // console.log(data);
     return (
       <Modal animationType = "fade"
@@ -87,10 +89,12 @@ const randomPick = (itemList, loopTime, libName) => {
              visible = {visible}
              onRequestClose = {onClose}
       >
-        <SafeAreaView style = {styles.modalView}>
+        <SafeAreaView testID = "leadModalDisplay"
+                      style = {styles.modalView}>
           <ScrollView>
             <View style = {styles.modalConView}>
-              <TouchableOpacity style = {styles.closeButton}
+              <TouchableOpacity testID = "closeButton"
+                                style = {styles.closeButton}
                                 onPress = {onClose}
               >
                 <MaterialCommunityIcons name = "close-thick"
@@ -100,17 +104,16 @@ const randomPick = (itemList, loopTime, libName) => {
               </TouchableOpacity>
 
               {data.map((d, i) => (
-                <Fragment key = {i}>
-
-                  <Text style = {styles.leadScoreText}>
+                <View testID = {`dataView-${i}`} key = {i}>
+                  <Text testID = {`award-${i}`} style = {styles.leadScoreText}>
                     <FontAwesome6 name = "award"
                                   size = {screenDimensions.width/16}
                                   color = "#331005"
                     />
                   </Text>
-                  <Text style = {styles.leadScoreText}>Score {d.score}</Text>
-                  <Text style = {styles.leadText}>{d.username}</Text>
-                </Fragment>
+                  <Text testID = {`score-${i}`} style = {styles.leadScoreText}>Score {d.score}</Text>
+                  <Text testID = {`username-${i}`} style = {styles.leadText}>{d.username}</Text>
+                </View>
               ))}
             </View>
           </ScrollView>
@@ -219,8 +222,8 @@ const randomPick = (itemList, loopTime, libName) => {
     return(
       <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
         <SafeAreaView style = {styles.safeArea}>
-          <View style = {styles.buttonCon}>
-            <TouchableOpacity style = {styles.button}
+          <View testID = "buttonCon" style = {styles.buttonCon}>
+            <TouchableOpacity testID = "homeButton" style = {styles.button}
                               onPress = {() => navigation.navigate("OnlineMode")}
             >
               <MaterialCommunityIcons name = "home"
@@ -229,7 +232,7 @@ const randomPick = (itemList, loopTime, libName) => {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style = {styles.button}
+            <TouchableOpacity testID = "leadButton" style = {styles.button}
                               onPress = {() => procLeadData(configLeadModal, configLeadData)}
             >
               <MaterialIcons name = "leaderboard"
@@ -238,7 +241,7 @@ const randomPick = (itemList, loopTime, libName) => {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style = {styles.button}
+            <TouchableOpacity testID = "logOutButton" style = {styles.button}
                               onPress = {() => handleLogout()}
             >
               <MaterialCommunityIcons style = {styles.symbol}
@@ -254,12 +257,13 @@ const randomPick = (itemList, loopTime, libName) => {
             />
           </View>
 
-          <View style = {styles.scoreLvlContainer}>
+          <View testID = "scoreLvlCon" style = {styles.scoreLvlContainer}>
             <MaterialCommunityIcons name = "trophy-outline"
                                     size = {screenDimensions.width/12}
                                     color = "#331005"
             />
             <Text style = {styles.scoreLvlText}>{disLevel}</Text>
+
             <View style = {styles.gap}/>
 
             <MaterialIcons name = "grade"
@@ -267,6 +271,7 @@ const randomPick = (itemList, loopTime, libName) => {
                            color = "#331005"
             />
             <Text style = {styles.scoreLvlText}>{disScore}</Text>
+
             <View style = {styles.gap}/>
 
             <FontAwesome6 name = "gem"
@@ -276,7 +281,7 @@ const randomPick = (itemList, loopTime, libName) => {
             <Text style = {styles.scoreLvlText}>{disCoin}</Text>
           </View>
 
-          <View style = {styles.displayGameContainer}>
+          <View testID = "displayGameCon" style = {styles.displayGameContainer}>
             <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
                         score = {disScore} computeScore = {computeScore}
                         coin = {disCoin} computeCoin = {computeCoin}

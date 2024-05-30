@@ -102,7 +102,7 @@ describe("generateLibrary", () => {
 
 // INTEGRATION Test OfflineGameScreen rendering
 describe("OfflineGameScreen", () => {
-    test("OfflineGame renders correctly", () => {
+    it("should render OfflineGame correctly", () => {
         const navigation = {
             navigate: jest.fn()
         };
@@ -114,19 +114,14 @@ describe("OfflineGameScreen", () => {
                                     />);
 
         // Home button
-        const homeButton = getByTestId("homeButton");
-        expect(homeButton).toBeTruthy();
-
+        expect(getByTestId("homeButton")).toBeTruthy();
         // Level display
-        const levelDisplay = getByTestId("levelDisplay");
-        expect(levelDisplay).toBeTruthy();
-
+        expect(getByTestId("levelDisplay")).toBeTruthy();
         // Score display
-        const scoreDisplay = getByTestId("scoreDisplay");
-        expect(scoreDisplay).toBeTruthy();
-
+        expect(getByTestId("scoreDisplay")).toBeTruthy();
         // Test that the gem icon is rendered
-        const coinDisplay = getByTestId("coinDisplay");
-        expect(coinDisplay).toBeTruthy();
+        expect(getByTestId("coinDisplay")).toBeTruthy();
+        // Displaygame container
+        expect(getByTestId("displayGameCon")).toBeTruthy();
     });
 });

@@ -190,7 +190,7 @@ OfflineGameScreen = ({navigation, route}) => {
           <Text testID = "coinDisplay" style = {styles.scoreLvlText}>{disCoin}</Text>
         </View>
 
-        <View style = {styles.displayGameContainer}>
+        <View testID = "displayGameCon" style = {styles.displayGameContainer}>
           <DisplayGame level = {disLevel} maxLevel = {maxLevel} gamePerLevel = {gamePerLevel}
                       score = {disScore} computeScore = {computeScore}
                       coin = {disCoin} computeCoin = {computeCoin}

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 
-// import { ScrollView } from "react-native-gesture-handler";
 // word-exists requires external API (only ONLINE)
 import wordExists from "word-exists";
 
-// user will be able to use the app OFFLINE with readFile
-// however mit.edu not cover enough words, so use word-exists package instead
-// code is here for completeness only
+// // user will be able to use the app OFFLINE with readFile
+// // however mit.edu not cover enough words, so use word-exists package instead
+// // code is here for completeness only
 // import readFile from "../helpers/readFile2";
 
 // // use with readFile
@@ -16,7 +15,7 @@ import wordExists from "word-exists";
 
 // // use with readFile
 // procReadFile()
-// .then(wordList =>{
+// .then(wordList => {
 //     wordLibrary = wordList;
 // })
 // .catch(error => {
@@ -25,7 +24,8 @@ import wordExists from "word-exists";
 
 const screenDimensions = Dimensions.get("screen");
 
-const generateGrid = (crosswordsProc) => {
+// Generate a grid of words, export for testing only
+export const generateGrid = (crosswordsProc) => {
     const grid = Array(10).fill(0).map(() => Array(10).fill("-1"));
 
     crosswordsProc.forEach(({direction, word, xPos, yPos}, i) => {
@@ -41,7 +41,8 @@ const generateGrid = (crosswordsProc) => {
     return grid;
 };
 
-const generateMasterCell = (master) => {
+// Generate an "" array of a master word, export for testing only
+export const generateMasterCell = (master) => {
     const masterCell = Array(master.length).fill("");
     return masterCell;
 };
@@ -190,9 +191,6 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
         let solvedGameArr = [...solvedGame];
         let nGame = numGame;
 
-        // console.log(solvedGame, gamePerLevel);
-        // console.log(numGame, nGame);
-
         // Only incase when gamePerLevel <= score to level up
         // Not apply in this App!!!
         // Just here for completeness!!!
@@ -256,17 +254,18 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
 
 
     const displayGrid = () => (
-        <View>
+        <View testID = "grid">
             {disGrid.map((row, i) => (
                 <View key = {i} style = {styles.row}>
                     {row.map((cell, j) => (
                         <View key = {j} style = {styles.wordCell}>
-                            <TextInput style = {[styles.cell,
+                            <TextInput testID = {`cell-${i}-${j}`}
+                                       style = {[styles.cell,
                                                 cell === "-1" ? styles.emptyCell : null]}
-                                        value = {cell}
-                                        editable = {cell !== "-1"}
-                                        maxLength = {1}
-                                        onChangeText = {(input) => handleGridInput(i, j, input.toUpperCase())}
+                                       value = {cell}
+                                       editable = {cell !== "-1"}
+                                       maxLength = {1}
+                                       onChangeText = {(input) => handleGridInput(i, j, input.toUpperCase())}
                             />
 
                             {crosswordData.map(({xPos, yPos, direction}, ind) => {

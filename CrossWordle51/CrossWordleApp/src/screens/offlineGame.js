@@ -11,7 +11,8 @@ const screenDimensions = Dimensions.get("screen");
 
 
 // -------- Generate words positions --------
-const randomPick = (itemList, loopTime, libName) => {
+// Export for testing only
+export const randomPick = (itemList, loopTime, libName) => {
   while(itemList.length < loopTime){
     chosenItem = libName[Math.floor(Math.random() * libName.length)]
     if(itemList.indexOf(chosenItem) === -1){
@@ -24,7 +25,8 @@ const randomPick = (itemList, loopTime, libName) => {
 
 
 // -------- Generate grids data (game) --------
-const generateLibrary = (gen, level, game, word) => {
+// Export for testing only
+export const generateLibrary = (gen, level, game, word) => {
   const positions = [0, 1, 2, 3, 4];
   let wXpos = [];
   let wYpos = [];
@@ -156,7 +158,8 @@ OfflineGameScreen = ({navigation, route}) => {
   return(
     <KeyboardAvoidingView style = {styles.container} behavior = {Platform.OS === "ios" ? "padding" : "height"}>
       <SafeAreaView style = {styles.safeArea}>
-        <TouchableOpacity style = {styles.button}
+        <TouchableOpacity testID = "homeButton"
+                          style = {styles.button}
                           onPress = {() => navigation.navigate("Welcome")}
         >
           <MaterialCommunityIcons name = "home"
@@ -170,21 +173,21 @@ OfflineGameScreen = ({navigation, route}) => {
                                   size = {screenDimensions.width/12}
                                   color = "#331005"
           />
-          <Text style = {styles.scoreLvlText}>{disLevel}</Text>
+          <Text testID = "levelDisplay" style = {styles.scoreLvlText}>{disLevel}</Text>
           <View style = {styles.gap}/>
 
           <MaterialIcons name = "grade"
                           size = {screenDimensions.width/12}
                           color = "#331005"
           />
-          <Text style = {styles.scoreLvlText}>{disScore}</Text>
+          <Text testID = "scoreDisplay" style = {styles.scoreLvlText}>{disScore}</Text>
           <View style = {styles.gap}/>
 
           <FontAwesome6 name = "gem"
                         size = {screenDimensions.width/14}
                         color = "#331005"
           />
-          <Text style = {styles.scoreLvlText}>{disCoin}</Text>
+          <Text testID = "coinDisplay" style = {styles.scoreLvlText}>{disCoin}</Text>
         </View>
 
         <View style = {styles.displayGameContainer}>

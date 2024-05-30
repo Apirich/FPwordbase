@@ -15,7 +15,7 @@ SignupScreen = ({navigation, route}) => {
   return(
     <View style = {styles.container}>
       <SafeAreaView>
-        <TouchableOpacity style = {styles.backButton}
+        <TouchableOpacity testID = "backButton" style = {styles.backButton}
                           onPress = {() => navigation.navigate("OnlineMode")}
         >
           <Ionicons name = "chevron-back-outline"

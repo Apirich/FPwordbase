@@ -109,8 +109,7 @@ describe("DisplayGame", () => {
                                     />);
 
         // Mock input
-        const userInput = getByTestId("cell-0-1");
-        fireEvent.changeText(userInput, "A");
+        fireEvent.changeText(getByTestId("cell-0-1"), "A");
 
         // Undefined without using Promise
         return new Promise((resolve, reject) => {

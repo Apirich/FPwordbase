@@ -14,7 +14,7 @@ jest.mock("random-words", () => ({
 
 
 // Mock SQLite
-jest.mock("../src/database/dbQueries", () => ({
+jest.mock("../src/database/dbQueries.js", () => ({
     getScore: jest.fn(() => Promise.resolve()),
     updateScore: jest.fn(() => Promise.resolve()),
     getCoin: jest.fn(() => Promise.resolve()),
@@ -23,7 +23,7 @@ jest.mock("../src/database/dbQueries", () => ({
 
 
 // Mock DisplayGame
-jest.mock("../src/components/grid", () => {
+jest.mock("../src/components/grid.js", () => {
     return jest.fn();
 });
 

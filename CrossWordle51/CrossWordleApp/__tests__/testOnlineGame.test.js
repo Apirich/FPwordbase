@@ -24,7 +24,7 @@ jest.mock("../src/database/fetchBackend.js", () => ({
 
 
 // Mock DisplayGame
-jest.mock("../src/components/grid", () => {
+jest.mock("../src/components/grid.js", () => {
     return jest.fn();
 });
 
@@ -119,7 +119,7 @@ describe("OnlineGameScreen", () => {
         const route = {};
 
         const {getByTestId} = render(<OnlineGameScreen navigation = {navigation}
-                                                        route = {route}
+                                                       route = {route}
                                     />);
 
         // Button container

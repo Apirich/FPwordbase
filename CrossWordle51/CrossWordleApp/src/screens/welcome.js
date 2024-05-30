@@ -13,22 +13,25 @@ WelcomeScreen = ({navigation, route}) => {
   return(
     <View style = {styles.container}>
       <SafeAreaView>
-        <Text style = {styles.appNameText}>Crosswordle</Text>
+        <Text style = {styles.appNameText}>CrossWordle</Text>
 
-        <TouchableOpacity style = {[styles.button, internetChecking ? null : styles.disableButton]}
+        <TouchableOpacity testID = "onlineButton"
+                          style = {[styles.button, internetChecking ? null : styles.disableButton]}
                           onPress = {() => navigation.navigate("OnlineMode")}
                           disabled = {internetChecking ? false : true}
         >
           <Text style = {[styles.buttonText, internetChecking ? null : styles.disableButton]}>Online Mode</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style = {[styles.button, {marginTop: screenDimensions.height/20}]}
+        <TouchableOpacity testID = "offlineButton"
+                          style = {[styles.button, {marginTop: screenDimensions.height/20}]}
                           onPress = {() => navigation.navigate("OfflineGame")}
         >
           <Text style = {[styles.buttonText]}>Offline Mode</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style = {styles.infoButton}
+        <TouchableOpacity testID = "infoButton"
+                          style = {styles.infoButton}
                           onPress = {() => setInfoModal(true)}
         >
           <MaterialCommunityIcons name = "information-outline"

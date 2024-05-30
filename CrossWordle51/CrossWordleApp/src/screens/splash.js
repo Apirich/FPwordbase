@@ -8,11 +8,12 @@ SplashScreen = (internetStatus) => {
     <View style = {styles.container}>
       <SafeAreaView>
         <Image
+          testID = "logo"
           style = {styles.logo}
           source = {require("../../assets/crosswordleLogo.png")}
         />
 
-        <ActivityIndicator size = {"large"}/>
+        <ActivityIndicator testID = "indicator" size = {"large"}/>
 
         <Text>{internetStatus ? "" : "Your internet connection status is offline, only Offline Mode will be available!"}</Text>
       </SafeAreaView>

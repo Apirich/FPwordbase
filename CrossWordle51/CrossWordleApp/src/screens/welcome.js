@@ -42,7 +42,7 @@ WelcomeScreen = ({navigation, route}) => {
                visible = {infoModal}
                onRequestClose = {() => setInfoModal(false)}
         >
-          <View style = {styles.modalView}>
+          <SafeAreaView style = {styles.modalView}>
             <View style = {styles.modalConView}>
               <ScrollView scrollIndicatorInsets = {{right: -screenDimensions.width/2}}>
                 <TouchableOpacity style = {styles.closeButton}
@@ -103,7 +103,7 @@ WelcomeScreen = ({navigation, route}) => {
                 </Text>
               </ScrollView>
             </View>
-          </View>
+          </SafeAreaView>
         </Modal>
       </SafeAreaView>
     </View>

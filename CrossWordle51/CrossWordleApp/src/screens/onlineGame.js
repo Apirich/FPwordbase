@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal } from "react-native";
+import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal, ScrollView } from "react-native";
 import { Fragment, useEffect, useState } from "react";
 import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
@@ -87,32 +87,34 @@ const randomPick = (itemList, loopTime, libName) => {
              visible = {visible}
              onRequestClose = {onClose}
       >
-        <View style = {styles.modalView}>
-          <View style = {styles.modalConView}>
-            <TouchableOpacity style = {styles.closeButton}
-                              onPress = {onClose}
-            >
-              <MaterialCommunityIcons name = "close-thick"
-                                      size = {screenDimensions.width/18}
-                                      color = "#f6efde"
-              />
-            </TouchableOpacity>
+        <SafeAreaView style = {styles.modalView}>
+          <ScrollView>
+            <View style = {styles.modalConView}>
+              <TouchableOpacity style = {styles.closeButton}
+                                onPress = {onClose}
+              >
+                <MaterialCommunityIcons name = "close-thick"
+                                        size = {screenDimensions.width/18}
+                                        color = "#f6efde"
+                />
+              </TouchableOpacity>
 
-            {data.map((d, i) => (
-              <Fragment key = {i}>
+              {data.map((d, i) => (
+                <Fragment key = {i}>
 
-                <Text style = {styles.leadScoreText}>
-                  <FontAwesome6 name = "award"
-                                size = {screenDimensions.width/16}
-                                color = "#331005"
-                  />
-                </Text>
-                <Text style = {styles.leadScoreText}>Score {d.score}</Text>
-                <Text style = {styles.leadText}>{d.username}</Text>
-              </Fragment>
-            ))}
-          </View>
-        </View>
+                  <Text style = {styles.leadScoreText}>
+                    <FontAwesome6 name = "award"
+                                  size = {screenDimensions.width/16}
+                                  color = "#331005"
+                    />
+                  </Text>
+                  <Text style = {styles.leadScoreText}>Score {d.score}</Text>
+                  <Text style = {styles.leadText}>{d.username}</Text>
+                </Fragment>
+              ))}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
       </Modal>
     );
   };
@@ -310,6 +312,7 @@ const styles = StyleSheet.create({
     },
 
     modalConView: {
+      marginTop: screenDimensions.height/8,
       backgroundColor: "#f6efde",
       padding: screenDimensions.width/14,
       borderRadius: screenDimensions.width/28,

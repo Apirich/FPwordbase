@@ -30,12 +30,12 @@ const pool = mysql.createPool({
 const verifyToken = (req, res, next) => {
   // Split the "Bearer" prefix
   const token = req.headers["authorization"].split(" ")[1];
-  if (!token) return res.status(403).json({ error: "No token provided" });
+  if (!token) return res.status(403).json({error: "No token provided"});
 
   jwt.verify(token, secretKey, (error, decoded) => {
     if(error){
       console.log("verifyToken Error: ", error);
-      return res.status(401).json({ error: "Failed to authenticate token" });
+      return res.status(401).json({error: "Failed to authenticate token"});
     }
 
     req.userId = decoded.id;
@@ -48,7 +48,7 @@ const verifyToken = (req, res, next) => {
 const extractUserId = (req, res, next) => {
   // Split the "Bearer" prefix
   const token = req.headers["authorization"].split(" ")[1];
-  if (!token) return res.status(403).json({ error: "No token provided" });
+  if (!token) return res.status(403).json({error: "No token provided"});
 
   try{
     const decoded = jwt.decode(token);
@@ -57,7 +57,7 @@ const extractUserId = (req, res, next) => {
     next();
   }catch(error){
     console.log("extractUserId Error: ", error);
-    return res.status(401).json({ error: "Failed to extract userId" });
+    return res.status(401).json({error: "Failed to extract userId"});
   }
 };
 
@@ -101,7 +101,7 @@ app.post("/signup", (req, res) => {
     pool.getConnection((error, connection) => {
       if(error){
         console.error("PSignup POOL CONNECTION Error acquiring connection:", error);
-        return res.status(500).json({ error: "PSignup POOL CONNECTION: Internal Server Error" });
+        return res.status(500).json({error: "PSignup POOL CONNECTION: Internal Server Error"});
       }
 
       // Insert user into database
@@ -111,7 +111,7 @@ app.post("/signup", (req, res) => {
             connection.rollback(() => {
               // Release the connection back to the pool
               connection.release();
-              return res.status(400).json({ error: "PSignup: User already exists" });
+              return res.status(400).json({error: "PSignup: User already exists"});
             });
           }else{
             console.error("Error executing query:", error);
@@ -119,7 +119,7 @@ app.post("/signup", (req, res) => {
             connection.rollback(() => {
               // Release the connection back to the pool
               connection.release();
-              return res.status(500).json({ error: "PSignup - insert user: Internal Server Error" });
+              return res.status(500).json({error: "PSignup - insert user: Internal Server Error"});
             });
           }
         }else{
@@ -134,7 +134,7 @@ app.post("/signup", (req, res) => {
               connection.rollback(() => {
                 // Release the connection back to the pool
                 connection.release();
-                return res.status(500).json({ error: "PSignup - insert score: Internal Server Error" });
+                return res.status(500).json({error: "PSignup - insert score: Internal Server Error"});
               });
             }else{
               // Insert initial coins into the coins table
@@ -145,7 +145,7 @@ app.post("/signup", (req, res) => {
                   connection.rollback(() => {
                     // Release the connection back to the pool
                     connection.release();
-                    return res.status(500).json({ error: "PSignup - insert coin: Internal Server Error" });
+                    return res.status(500).json({error: "PSignup - insert coin: Internal Server Error"});
                   });
                 }else{
                   // Commit the transaction
@@ -156,12 +156,12 @@ app.post("/signup", (req, res) => {
                       connection.rollback(() => {
                         // Release the connection back to the pool
                         connection.release();
-                        return res.status(500).json({ error: "PSignup - committing: Internal Server Error" });
+                        return res.status(500).json({error: "PSignup - committing: Internal Server Error"});
                       });
                     }else{
                       // Release the connection back to the pool
                       connection.release();
-                      res.status(201).json({ message: "PSignup: User created successfully" });
+                      res.status(201).json({message: "PSignup: User created successfully"});
                     }
                   });
                 }
@@ -193,13 +193,13 @@ app.post("/login", (req, res) => {
         connection.release();
 
         if(error || results.length === 0){
-          return res.status(401).json({ error: "PLogin: Invalid email" });
+          return res.status(401).json({error: "PLogin: Invalid email"});
         }
         else{
           // Compare password
           bcrypt.compare(password, results[0].password, (error, result) => {
             if(error || !result){
-              return res.status(401).json({ error: "PLogin: Invalid password" });
+              return res.status(401).json({error: "PLogin: Invalid password"});
             }else{
               // Check if user is logging in
               connection.query("SELECT * FROM logins WHERE user_id = ?", [results[0].id], (error, loginResults) => {
@@ -208,14 +208,14 @@ app.post("/login", (req, res) => {
                   connection.release();
 
                   console.error("PLogin: Error checking logging in:", error);
-                  return res.status(500).json({ error: "PLogin checking loggingin: Internal Server Error" });
+                  return res.status(500).json({error: "PLogin checking loggingin: Internal Server Error"});
                 }else{
                   // User is logging in
                   if(loginResults.length > 0){
                     // Release the connection back to the pool
                     connection.release();
 
-                    return res.json({ message: "PLogin: You are currently logging in on a device" });
+                    return res.json({message: "PLogin: You are currently logging in on a device"});
                   }else{
                     // Insert entry into logins table
                     connection.query("INSERT INTO logins (user_id) VALUES (?)", [results[0].id], (error, loginInsertResults) => {
@@ -224,7 +224,7 @@ app.post("/login", (req, res) => {
 
                       if(error) {
                         console.error("PLogin: Error inserting login entry:", error);
-                        return res.status(500).json({ error: "PLogin inserting login entry: Internal Server Error" });
+                        return res.status(500).json({error: "PLogin inserting login entry: Internal Server Error"});
                       }else{
                         // Token expiration time
                         const expTime = "1h";
@@ -234,9 +234,9 @@ app.post("/login", (req, res) => {
                         const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600;
 
                         // Generate JWT token
-                        const token = jwt.sign({ id: results[0].id }, secretKey, { expiresIn: expTime });
+                        const token = jwt.sign({id: results[0].id}, secretKey, {expiresIn: expTime});
 
-                        res.json({ message: "PLogin: Login successful with token", token, expTimestamp });
+                        res.json({message: "PLogin: Login successful with token", token, expTimestamp});
                       }
                     });
                   }
@@ -266,9 +266,9 @@ app.post("/refresh", extractUserId, (req, res) => {
   const expTimestamp = Math.floor(Date.now() / 1000) + parseInt(expTime) * 3600;
 
   // Generate JWT token
-  const token = jwt.sign({ id: userId }, secretKey, { expiresIn: expTime });
+  const token = jwt.sign({id: userId}, secretKey, {expiresIn: expTime});
 
-  res.json({ message: "PRefresh: Successful refresh token", token, expTimestamp });
+  res.json({message: "PRefresh: Successful refresh token", token, expTimestamp});
 });
 
 
@@ -283,7 +283,7 @@ app.delete("/expired", extractUserId, (req, res) => {
   pool.getConnection((error, connection) => {
     if(error){
       console.error("DExpired POOL CONNECTION: Error acquiring connection:", error);
-      return res.status(500).json({ error: "DExpired POOL CONNECTION: Internal Server Error" });
+      return res.status(500).json({error: "DExpired POOL CONNECTION: Internal Server Error"});
     }else{
       // Delete login from the database
       connection.query("DELETE FROM logins WHERE user_id = ?", [userId], (error, results) => {
@@ -291,7 +291,7 @@ app.delete("/expired", extractUserId, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "DExpired: Error deleting login" });
+          return res.status(500).json({error: "DExpired: Error deleting login"});
         }else{
           res.status(204).send();
         }
@@ -319,7 +319,7 @@ app.delete("/logout", verifyToken, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "DLogout: Error deleting login" });
+          return res.status(500).json({error: "DLogout: Error deleting login"});
         }else{
           res.status(204).send();
         }
@@ -339,7 +339,7 @@ app.get("/score", verifyToken, (req, res) => {
   pool.getConnection((error, connection) => {
     if(error){
       console.error("GScore POOL CONNECTION: Error acquiring connection:", error);
-      return res.status(500).json({ error: "GScore POOL CONNECTION: Internal Server Error" });
+      return res.status(500).json({error: "GScore POOL CONNECTION: Internal Server Error"});
     }else{
       // Retrieve score from the database
       connection.query("SELECT score FROM scores WHERE user_id = ?", [userId], (error, results) => {
@@ -347,10 +347,10 @@ app.get("/score", verifyToken, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "GScore: Error retrieving score" });
+          return res.status(500).json({error: "GScore: Error retrieving score"});
         }else{
           if(results.length === 0){
-            return res.status(404).json({ error: "GScore: Score not found for this user" });
+            return res.status(404).json({error: "GScore: Score not found for this user"});
           }else{
             const score = results[0].score;
             res.json({score});
@@ -372,7 +372,7 @@ app.get("/coin", verifyToken, (req, res) => {
   pool.getConnection((error, connection) => {
     if(error){
       console.error("GCoin POOL CONNECTION: Error acquiring connection:", error);
-      return res.status(500).json({ error: "GCoin POOL CONNECTION: Internal Server Error" });
+      return res.status(500).json({error: "GCoin POOL CONNECTION: Internal Server Error"});
     }else{
       // Retrieve coin from the database
       connection.query("SELECT coin FROM coins WHERE user_id = ?", [userId], (error, results) => {
@@ -380,10 +380,10 @@ app.get("/coin", verifyToken, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "GCoin: Error retrieving coin" });
+          return res.status(500).json({error: "GCoin: Error retrieving coin"});
         }else{
           if(results.length === 0){
-            return res.status(404).json({ error: "GCoin: Coin not found for this user" });
+            return res.status(404).json({error: "GCoin: Coin not found for this user"});
           }else{
             const coin = results[0].coin;
             res.json({coin});
@@ -405,7 +405,7 @@ app.post("/updateScore", verifyToken, (req, res) => {
   // Obtain a connection from the pool
   pool.getConnection((error, connection) => {
     if(error){
-      return res.status(500).json({ error: "PScore POOL CONNECTION: Internal Server Error" });
+      return res.status(500).json({error: "PScore POOL CONNECTION: Internal Server Error"});
     }else{
       // Update score in the database
       connection.query("UPDATE scores SET score = ? WHERE user_id = ?", [score, userId], (error, results) => {
@@ -413,9 +413,9 @@ app.post("/updateScore", verifyToken, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "PScore: Error updating score" });
+          return res.status(500).json({error: "PScore: Error updating score"});
         }else{
-          res.status(200).json({ message: "PScore: Score updated successfully" });
+          res.status(200).json({message: "PScore: Score updated successfully"});
         }
       });
     }
@@ -433,7 +433,7 @@ app.post("/updateCoin", verifyToken, (req, res) => {
   // Obtain a connection from the pool
   pool.getConnection((error, connection) => {
     if(error){
-      return res.status(500).json({ error: "PCoin POOL CONNECTION: Internal Server Error" });
+      return res.status(500).json({error: "PCoin POOL CONNECTION: Internal Server Error"});
     }else{
       // Update coin in the database
       connection.query("UPDATE coins SET coin = ? WHERE user_id = ?", [coin, userId], (error, results) => {
@@ -441,9 +441,9 @@ app.post("/updateCoin", verifyToken, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "PCoin: Error updating coin" });
+          return res.status(500).json({error: "PCoin: Error updating coin"});
         }else{
-          res.status(200).json({ message: "PCoin: Coin updated successfully" });
+          res.status(200).json({message: "PCoin: Coin updated successfully"});
         }
       });
     }
@@ -459,7 +459,7 @@ app.get("/lead", verifyToken, (req, res) => {
   pool.getConnection((error, connection) => {
     if(error){
       console.error("GScore POOL CONNECTION: Error acquiring connection:", error);
-      return res.status(500).json({ error: "GScore POOL CONNECTION: Internal Server Error" });
+      return res.status(500).json({error: "GScore POOL CONNECTION: Internal Server Error"});
     }else{
       // SQL command
       const query = `SELECT scores.score, users.username
@@ -475,10 +475,10 @@ app.get("/lead", verifyToken, (req, res) => {
         connection.release();
 
         if(error){
-          return res.status(500).json({ error: "GScore: Error retrieving lead scores" });
+          return res.status(500).json({error: "GScore: Error retrieving lead scores"});
         }else{
           if(results.length === 0){
-            return res.status(404).json({ error: "GScore: Score not found for this user" });
+            return res.status(404).json({error: "GScore: Score not found for this user"});
           }else{
             const leadScores = results;
             res.json({leadScores});
@@ -493,3 +493,6 @@ app.get("/lead", verifyToken, (req, res) => {
 app.listen(port, () => {
   console.log(`Server is listening at port ${port}`);
 });
+
+
+

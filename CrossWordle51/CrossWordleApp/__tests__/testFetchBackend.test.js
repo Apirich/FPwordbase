@@ -48,6 +48,7 @@ describe("handleSignUp", () => {
 
                 // "OnlineMode" navigation
                 expect(NavigationService.navigate).toHaveBeenCalledWith("OnlineMode");
+
                 resolve();
             }catch(error){
                 reject(error);
@@ -72,6 +73,7 @@ describe("handleSignUp", () => {
                 expect(NavigationService.navigate).not.toHaveBeenCalled();
                 // Alert
                 expect(alert).toHaveBeenCalledWith("This username or email are already registered with CrossWordle!");
+
                 resolve();
             }catch(error){
                 reject(error);
@@ -95,6 +97,7 @@ describe("handleLogin", () => {
 
                 // Alert
                 expect(alert).toHaveBeenCalledWith("Your inputs are empty");
+
                 resolve();
             }catch(error){
                 reject(error);
@@ -120,6 +123,7 @@ describe("handleLogin", () => {
 
                 // "OnlineGame" navigation
                 expect(NavigationService.navigate).toHaveBeenCalledWith("OnlineGame");
+
                 resolve();
             }catch(error){
                 reject(error);
@@ -143,6 +147,7 @@ describe("handleLogin", () => {
                 expect(NavigationService.navigate).not.toHaveBeenCalled();
                 // Alert
                 expect(alert).toHaveBeenCalledWith("Invalid email or password!");
+
                 resolve();
             }catch(error){
                 reject(error);
@@ -166,6 +171,7 @@ describe("handleLogin", () => {
                 expect(NavigationService.navigate).not.toHaveBeenCalled();
                 // Alert
                 expect(alert).toHaveBeenCalledWith("Your CrossWordle account is currently logged in on another device!");
+                
                 resolve();
             }catch(error){
                 reject(error);

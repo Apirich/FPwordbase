@@ -119,6 +119,7 @@ describe("DisplayGame", () => {
 
                 // Expect the grid cell with new input value "A"
                 expect(newGrid.props.children[0].props.children[1].props.value).toBe("A");
+                
                 resolve();
             }catch(error){
                 reject(error);

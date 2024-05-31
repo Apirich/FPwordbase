@@ -45,10 +45,8 @@ describe("randomPick", () => {
     it("should return an array with unique random positions", () => {
         // Initial itemList is always empty
         const itemList = [];
-
         const loopTime = 5;
         const libName = [0, 1, 2, 3, 4];
-
         const result = randomPick(itemList, loopTime, libName);
 
         // Expect an array of length loopTime (5)

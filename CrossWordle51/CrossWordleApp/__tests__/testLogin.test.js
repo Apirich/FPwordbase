@@ -46,6 +46,7 @@ describe("LoginScreen", () => {
         // Mock "Back" button press
         fireEvent.press(getByTestId("backButton"));
 
+        // "OnlineMode" navigation
         expect(navigation.navigate).toHaveBeenCalledWith("OnlineMode");
     });
 });

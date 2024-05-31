@@ -186,7 +186,7 @@ describe("GET /lead", () => {
 
                 // Response status 200
                 expect(response.status).toBe(200);
-                // Response score
+                // Response top three
                 expect(response.body).toHaveProperty("leadScores", top3);
 
                 resolve();

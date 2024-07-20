@@ -21,7 +21,7 @@
     "@react-native-community/netinfo": "^11.3.1",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
-    "expo": "^51.0.20",
+    "expo": "^51.0.21",
     "expo-file-system": "^17.0.1",
     "expo-sqlite": "~13.4.0",
     "expo-status-bar": "^1.12.1",

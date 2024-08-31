@@ -30,7 +30,7 @@
     "random-words": "^2.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "^0.74.3",
+    "react-native": "^0.75.2",
     "react-native-gesture-handler": "^2.16.1",
     "react-native-web": "~0.19.6",
     "word-exists": "^1.0.0"

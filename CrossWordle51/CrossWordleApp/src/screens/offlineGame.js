@@ -1,8 +1,12 @@
-import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import { MaterialCommunityIcons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
 
-import { generate, count } from "random-words";
+// Code to implement offlineGame in the same way with onlineGame
+// (*** Code is here only for learning purpose***)
+// import { generate, count } from "random-words";
+
+import { processBag } from "../helpers/words2";
 import { getScore, updateScore, getCoin, updateCoin } from "../database/dbQueries";
 
 import DisplayGame from "../components/grid";
@@ -63,32 +67,38 @@ export const generateLibrary = (gen, level, game, word) => {
 
 // -------- Offline Game Screen --------
 OfflineGameScreen = ({navigation, route}) => {
+  const [loading, setLoading] = useState(true);
+
   const mode = "offline";
   const maxLevel = 10;
   const gamePerLevel = 3;
 
-  const [master, setMaster] = useState(generateLibrary(
-    generate({
-      exactly: 30,
-      wordsPerString: 1,
-      minLength: 6,
-      maxLength: 8,
-      formatter: (word) => word.toUpperCase(),
-    }), maxLevel, gamePerLevel, 1)
-  );
+  const [master, setMaster] = useState([]);
+  const [crosswords, setCrosswords] = useState([]);
 
-  const [crosswords, setCrosswords] = useState(generateLibrary(
-    generate({
-      exactly: 150,
-      wordsPerString: 1,
-      minLength: 3,
-      maxLength: 5,
-      formatter: (word) => word.toUpperCase(),
-    }), maxLevel, gamePerLevel, 5)
-  );
+  
+  // Code to implement offlineGame in the same way with onlineGame
+  // (*** Code is here only for learning purpose***)
+  // const [master, setMaster] = useState(generateLibrary(
+  //   generate({
+  //     exactly: 30,
+  //     wordsPerString: 1,
+  //     minLength: 6,
+  //     maxLength: 8,
+  //     formatter: (word) => word.toUpperCase(),
+  //   }), maxLevel, gamePerLevel, 1)
+  // );
 
-  // const [crosswords, setCrosswords] = useState(wordsList);
-  // const [master, setMaster] = useState(masterList);
+  // const [crosswords, setCrosswords] = useState(generateLibrary(
+  //   generate({
+  //     exactly: 150,
+  //     wordsPerString: 1,
+  //     minLength: 3,
+  //     maxLength: 5,
+  //     formatter: (word) => word.toUpperCase(),
+  //   }), maxLevel, gamePerLevel, 5)
+  // );
+
 
   const [disScore, setDisScore] = useState(0);
   const [disLevel, setDisLevel] = useState(1);
@@ -97,6 +107,20 @@ OfflineGameScreen = ({navigation, route}) => {
 
   // Retrieve score from the database, ONLY ONCE when the app start
   useEffect(() => {
+    const getWordsBags = async () => {
+      try{
+        const { masterBag, crossBag } = await processBag();
+        setMaster(generateLibrary(masterBag, maxLevel, gamePerLevel, 1));
+        setCrosswords(generateLibrary(crossBag, maxLevel, gamePerLevel, 5));
+
+        setLoading(false);
+      }catch(error){
+        console.error("Error getWordsBags:", error);
+      }
+    };
+
+    getWordsBags();
+
     getScore()
     .then((data) => {
       setDisScore(data);
@@ -154,6 +178,12 @@ OfflineGameScreen = ({navigation, route}) => {
 
   const computeCoin = (coin) => {
     setDisCoin(coin);
+  }
+
+  // Prevent grid of words (DisplayGame Component) rendering before bags of words are ready
+  // Can be omitted if use the same approach to onlineGame.
+  if(loading){
+    return <ActivityIndicator size = "large"/>;
   }
 
   return(

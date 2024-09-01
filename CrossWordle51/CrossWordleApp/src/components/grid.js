@@ -5,8 +5,7 @@ import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity, Keyboa
 import wordExists from "word-exists";
 
 // user will be able to use the app OFFLINE with readFile
-// however mit.edu not cover enough words, so use word-exists package instead
-// code is here for completeness only
+// however mit.edu not cover enough words, so use word-exists package if needed
 import readFile from "../helpers/readFile2";
 
 // use with readFile
@@ -145,9 +144,8 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                 }
 
                 // Use with wordLibrary (user can use the app OFFLINE)
-                // The wordlist from mit.edu is not enough word so use wordExists package instead
+                // The wordlist from mit.edu is not enough word so use wordExists package if needed
                 // wordExists requires external API
-                // code is here for completenese only
                 if(gameMode === "offline"){
                     if(inputWord !== "" && !wordLibrary.includes(inputWord.toLowerCase())){
                         alert("Ouch! One of your input word is not in the dictionary!");

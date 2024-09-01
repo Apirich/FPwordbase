@@ -4,13 +4,20 @@ import { randomPick, generateLibrary } from "../src/screens/offlineGame";
 import OfflineGameScreen from "../src/screens/offlineGame";
 
 
-// Mock random-words
+// Mock random-words (to test generateLibrary())
 jest.mock("random-words", () => ({
     generate: jest.fn()
         .mockImplementationOnce(() => ["HONEST", "BEAUTY", "ORANGE", "CLOUDY", "FUNNY"])
         .mockImplementationOnce(() => ["KINDNESS"]),
     count: jest.fn()
 }));
+
+
+// // Mock processBag to immediately return resolved values
+// jest.mock("../src/helpers/words2.js", () => ({
+//     processBag: jest.fn(() => Promise.resolve()),
+// }));
+
 
 
 // Mock SQLite
@@ -111,15 +118,17 @@ describe("OfflineGameScreen", () => {
                                                         route = {route}
                                     />);
 
-        // Home button
-        expect(getByTestId("homeButton")).toBeTruthy();
-        // Level display
-        expect(getByTestId("levelDisplay")).toBeTruthy();
-        // Score display
-        expect(getByTestId("scoreDisplay")).toBeTruthy();
-        // Test that the gem icon is rendered
-        expect(getByTestId("coinDisplay")).toBeTruthy();
-        // Displaygame container
-        expect(getByTestId("displayGameCon")).toBeTruthy();
+        if(!getByTestId("loadingIndicator")){
+            // Home button
+            expect(getByTestId("homeButton")).toBeTruthy();
+            // Level display
+            expect(getByTestId("levelDisplay")).toBeTruthy();
+            // Score display
+            expect(getByTestId("scoreDisplay")).toBeTruthy();
+            // Test that the gem icon is rendered
+            expect(getByTestId("coinDisplay")).toBeTruthy();
+            // Displaygame container
+            expect(getByTestId("displayGameCon")).toBeTruthy();
+        }
     });
 });

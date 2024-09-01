@@ -76,7 +76,7 @@ OfflineGameScreen = ({navigation, route}) => {
   const [master, setMaster] = useState([]);
   const [crosswords, setCrosswords] = useState([]);
 
-  
+
   // Code to implement offlineGame in the same way with onlineGame
   // (*** Code is here only for learning purpose***)
   // const [master, setMaster] = useState(generateLibrary(
@@ -183,7 +183,7 @@ OfflineGameScreen = ({navigation, route}) => {
   // Prevent grid of words (DisplayGame Component) rendering before bags of words are ready
   // Can be omitted if use the same approach to onlineGame.
   if(loading){
-    return <ActivityIndicator size = "large"/>;
+    return <ActivityIndicator testID = "loadingIndicator" size = "large"/>;
   }
 
   return(

@@ -4,23 +4,23 @@ import { StyleSheet, Text, TextInput, View, Dimensions, TouchableOpacity, Keyboa
 // word-exists requires external API (only ONLINE)
 import wordExists from "word-exists";
 
-// // user will be able to use the app OFFLINE with readFile
-// // however mit.edu not cover enough words, so use word-exists package instead
-// // code is here for completeness only
-// import readFile from "../helpers/readFile2";
+// user will be able to use the app OFFLINE with readFile
+// however mit.edu not cover enough words, so use word-exists package instead
+// code is here for completeness only
+import readFile from "../helpers/readFile2";
 
-// // use with readFile
-// const procReadFile = readFile;
-// let wordLibrary;
+// use with readFile
+const procReadFile = readFile;
+let wordLibrary;
 
-// // use with readFile
-// procReadFile()
-// .then(wordList => {
-//     wordLibrary = wordList;
-// })
-// .catch(error => {
-//     console.error("grid.js - procReadFile() ERROR: ", error);
-// })
+// use with readFile
+procReadFile()
+.then(wordList => {
+    wordLibrary = wordList;
+})
+.catch(error => {
+    console.error("grid.js - procReadFile() ERROR: ", error);
+})
 
 const screenDimensions = Dimensions.get("screen");
 
@@ -51,7 +51,8 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                       score, computeScore,
                       coin, computeCoin,
                       crosswordsProc,
-                      master}) => {
+                      master,
+                      mode}) => {
     const [numGame, setNumGame] = useState(0);
     const [disGrid, setDisGrid] = useState(generateGrid(crosswordsProc[(level - 1) % maxLevel][numGame]));
     const [disMaster, setDisMaster] = useState(generateMasterCell(master[(level - 1) % maxLevel][numGame]));
@@ -61,6 +62,7 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
     const [revealedGame, setRevealedGame] = useState("");
     const [disRevealStatus, setDisRevealStatus] = useState(false);
     const [disCheerLvUp, setDisCheerLvUp] = useState(false);
+    const [gameMode, setGameMode] = useState(mode);
 
     console.log(master[(level - 1) % maxLevel][numGame]);
 
@@ -134,21 +136,25 @@ const DisplayGame = ({level, maxLevel, gamePerLevel,
                 }
 
                 // Use with wordExists package (only ONLINE)
-                if(inputWord !== "" && !wordExists(inputWord)){
-                    alert("Ouch! One of your input word is not in the dictionary!");
-                    invalidInput = true;
-                    break;
+                if(gameMode === "online"){
+                    if(inputWord !== "" && !wordExists(inputWord)){
+                        alert("Ouch! One of your input word is not in the dictionary!");
+                        invalidInput = true;
+                        break;
+                    }
                 }
 
-                // // Use with wordLibrary (user can use the app OFFLINE)
-                // // The wordlist from mit.edu is not enough word so use wordExists package instead
-                // // wordExists requires external API
-                // // code is here for completenese only
-                // if(inputWord !== "" && !wordLibrary.includes(inputWord.toLowerCase())){
-                //     alert("Ouch! One of your input word is not in the dictionary!");
-                //     invalidInput = true;
-                //     break;
-                // }
+                // Use with wordLibrary (user can use the app OFFLINE)
+                // The wordlist from mit.edu is not enough word so use wordExists package instead
+                // wordExists requires external API
+                // code is here for completenese only
+                if(gameMode === "offline"){
+                    if(inputWord !== "" && !wordLibrary.includes(inputWord.toLowerCase())){
+                        alert("Ouch! One of your input word is not in the dictionary!");
+                        invalidInput = true;
+                        break;
+                    }
+                }
             }
 
             // Only verify matching letters if input are not empty

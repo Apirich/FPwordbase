@@ -106,6 +106,7 @@ describe("DisplayGame", () => {
                                                   coin = {0} computeCoin = {jest.fn()}
                                                   crosswordsProc = {crosswordsProc}
                                                   master = {master}
+                                                  mode = "mode"
                                     />);
 
         // Mock input
@@ -119,7 +120,7 @@ describe("DisplayGame", () => {
 
                 // Expect the grid cell with new input value "A"
                 expect(newGrid.props.children[0].props.children[1].props.value).toBe("A");
-                
+
                 resolve();
             }catch(error){
                 reject(error);

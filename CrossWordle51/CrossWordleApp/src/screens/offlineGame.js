@@ -63,6 +63,7 @@ export const generateLibrary = (gen, level, game, word) => {
 
 // -------- Offline Game Screen --------
 OfflineGameScreen = ({navigation, route}) => {
+  const mode = "offline";
   const maxLevel = 10;
   const gamePerLevel = 3;
 
@@ -196,6 +197,7 @@ OfflineGameScreen = ({navigation, route}) => {
                       coin = {disCoin} computeCoin = {computeCoin}
                       crosswordsProc = {crosswords}
                       master = {master}
+                      mode = {mode}
           />
         </View>
       </SafeAreaView>

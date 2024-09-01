@@ -29,7 +29,7 @@ const readFile = async () => {
                     .catch(error => reject("readFile.js: File not exists, download error:", error));
                 }else{  // Exist
                     FileSystem.readAsStringAsync(filePath)
-                    .then(fileContent => {
+                    .then(fileContent => {  // Open file
                         const fileArray = fileContent.split("\n");
                         resolve(fileArray);
                     })

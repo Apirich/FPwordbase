@@ -125,6 +125,7 @@ const randomPick = (itemList, loopTime, libName) => {
 
   // -------- Online Game Screen --------
   OnlineGameScreen = ({navigation, route}) => {
+    const mode = "online";
     const maxLevel = 10;
     const gamePerLevel = 3;
 
@@ -287,6 +288,7 @@ const randomPick = (itemList, loopTime, libName) => {
                         coin = {disCoin} computeCoin = {computeCoin}
                         crosswordsProc = {crosswords}
                         master = {master}
+                        mode = {mode}
             />
           </View>
         </SafeAreaView>

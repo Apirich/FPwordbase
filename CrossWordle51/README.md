@@ -4,6 +4,6 @@ To run the CrossWordle app, open two terminal windows: one for the backend serve
    
 On your mobile device, scan the QR code, and the Expo Go app will automatically load the application. (Ensure the Expo Go app is installed on your device.)
 
-For dependencies, please refer to the package.json file in both the CrossWordleBackend and CrossWordleApp folders.
+For dependencies, kindly refer to the package.json file in both the CrossWordleBackend and CrossWordleApp folders.
 
 Note: The CrossWordle application was tested using iPhone 8 and iPhone 13 with Expo Go SDK 51.
